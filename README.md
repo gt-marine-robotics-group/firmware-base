@@ -74,8 +74,8 @@ Video is too large, go watch it on the Notion page below
 
 - **Remove Build Flags in Library**  
   This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.
-  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now.
-  Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called.
+  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.
+  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called.
 
 ## Resources
 - **What is Programmable I/O on Raspberry Pi Pico?**  
