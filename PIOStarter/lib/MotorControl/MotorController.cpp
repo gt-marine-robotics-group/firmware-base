@@ -19,10 +19,11 @@ bool MotorController::estop(){
     return true;
 }
 
+// If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
 uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
     int32_t delta = static_cast<int32_t>(pot) - ADC_CENTER;
 
-    // Deadband → stop
+    // Deadband that way you aren't driving the motors super slow, which isn't great
     if (abs(delta) < DEADBAND) {
         digitalWrite(config::AI1, LOW);
         digitalWrite(config::AI2, LOW);
@@ -32,7 +33,7 @@ uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
         // Direction
         bool forward = (delta > 0);
 
-        // Scale magnitude: |delta| → 0–255
+        // Scale magnitude, converts difference from the pot center to a reasonable PWM value
         uint8_t pwm = (static_cast<uint32_t>(abs(delta)) * PWM_MAX) / ADC_CENTER;
 
         // Safety clamp
@@ -52,4 +53,5 @@ void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, ui
         results[i] = spinMotor(pins[i], PWMs[i]);
     }
 }
+
 
