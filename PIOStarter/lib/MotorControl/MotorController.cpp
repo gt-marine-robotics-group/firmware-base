@@ -1,3 +1,5 @@
+#ifdef HAS_MOTORS
+
 #include "MotorController.h"
 
 // Constructor
@@ -54,4 +56,4 @@ void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, ui
     }
 }
 
-
+#endif

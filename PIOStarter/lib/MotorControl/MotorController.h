@@ -1,4 +1,5 @@
 #pragma once
+#ifdef HAS_MOTORS
 
 #include <Arduino.h>
 #include "config.h"
@@ -23,3 +24,5 @@ class MotorController{
         
     private:
 };
+
+#endif

@@ -5,6 +5,7 @@
 #include "MotorController.h"
 #include "LEDPIO.h"
 #include "Estop.h"
+#include "I2CSensor.h"
 
 class AppCore {
 public:
@@ -25,7 +26,7 @@ public:
         #endif
 
         #ifdef HAS_SENSORS
-            sensors.begin();
+            tempSensor.setup();
         #endif
     }
 
@@ -41,10 +42,19 @@ public:
             #endif
         #endif
 
-        #ifdef HAS_MOTORS 
-        #ifdef HAS_INDICATOR_LED
-            pwm_input = pwm;
+        #ifdef HAS_SENSORS
+            temp = tempSensor.readData();
+            Serial.println(temp);
         #endif
+        
+        // Transfer the sensor or output value to LED blink
+        #ifdef HAS_INDICATOR_LED
+            #ifdef HAS_MOTORS 
+                pwm_input = pwm;
+            #endif
+            #ifdef HAS_SENSORS      // Check to see if #elifdef is supported
+                pwm_input = temp;
+            #endif
         #endif
 
         #ifdef HAS_INDICATOR_LED
@@ -70,6 +80,7 @@ private:
     #endif
     
     #ifdef HAS_SENSORS
-        SensorPackage sensors;
+        I2CSensor tempSensor;
+        uint8_t temp = 65;
     #endif
 };

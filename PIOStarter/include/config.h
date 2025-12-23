@@ -7,6 +7,7 @@ namespace config {
         #define HAS_MOTORS 1
         #define HAS_INDICATOR_LED 1
         #define HAS_ESTOP 1
+        #define HAS_SENSORS 0
 
         // Pinout (Pin Definitions)
         static constexpr uint8_t AI1 = 15;
@@ -23,10 +24,19 @@ namespace config {
     #endif
 
     #ifdef BOARD_BETA
-        #define USE_TEMPERATURE_SENSOR
-        #define USE_PRESSURE_SENSOR
+        #define HAS_INDICATOR_LED 1
+        #define HAS_ESTOP 1
+        #define HAS_SENSORS 1
 
-        static constexpr uint8_t PIN_I2C_SDA 4
-        static constexpr uint8_t PIN_I2C_SCL 5
+        // Pinout (Pin Definitions)
+        static constexpr uint8_t LED_PIN = 16;     // The pin that blinks
+        static constexpr uint8_t TRIGGER_PIN = 17; // The input pin we are watching
+
+        static constexpr uint8_t ESTOP_PIN = 13;
+        static constexpr uint8_t ESTOP_LED = 12;
+
+        static constexpr uint8_t TEMP_SDA = 10;
+        static constexpr uint8_t TEMP_SCL = 11;
+
     #endif
 }
