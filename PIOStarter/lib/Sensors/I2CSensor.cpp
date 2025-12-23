@@ -1,3 +1,5 @@
+#ifdef HAS_SENSORS
+
 #include "I2CSensor.h"
 
 // Constructor
@@ -39,5 +41,5 @@ uint16_t I2CSensor::readData() {
     return 1;
 }
 
-
+#endif
 
