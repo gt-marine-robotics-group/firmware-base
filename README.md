@@ -53,8 +53,8 @@ Video is too large, go watch it on the Notion page below
    
 ## Future Ideas to Implement
 
-- **I2C Data Collection**  
-  Collect I2C data either on the side or through PIO. I believe the sensing board has 4 I2C connections, which is too many.
+- **I2C Data Collection through PIO**  
+  Added regular I2C in main CPU context, but I believe the sensing board has 4 I2C connections, which is too many for a Pico without PIO.
 
 - **DMA Controller**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
