@@ -4,7 +4,7 @@
 <video src="https://github.gatech.edu/user-attachments/assets/e94030c5-7b0a-4ca9-8309-5265b8febaf2" controls>
   Your browser does not support the video tag.
 </video>
-
+Video is too large, go watch it on the Notion page below
 ## Project Iterations
 
 1. **Blink**  
