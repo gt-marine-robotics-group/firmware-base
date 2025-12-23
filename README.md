@@ -68,6 +68,10 @@ Video is too large, go watch it on the Notion page below
 - **Debugging capabilities**  
   Look into picoprobe
 
+- **Remove Build Flags in Library**  
+  This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.
+  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now.
+
 ## Resources
 - **What is Programmable I/O on Raspberry Pi Pico?**  
   [Read the article](https://magazine.raspberrypi.com/articles/what-is-programmable-i-o-on-raspberry-pi-pico)
