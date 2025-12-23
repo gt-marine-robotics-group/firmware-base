@@ -28,6 +28,9 @@ Video is too large, go watch it on the Notion page below
 
 6. **Object-Oriented Programming (OOP) Firmware Architecture**  
    Use OOP style firmware as a proof of concept for proper structure.
+
+7. **Added I2C Sensor**  
+   For other board configuration, added a Temp/Humidity sensor to demonstrate using an I2C Sensor.
    
 ## Highlights/Things to Note
 
@@ -40,6 +43,7 @@ Video is too large, go watch it on the Notion page below
 2. **Customizable Firmware Architecture**  
    The organization into a central app and several modules allows for the app to pick and choose which features to use.
    You can still keep central features like an E-Stop while deciding what sensors and peripherals you want.
+   This sample project has an example of every type of interface except SPI: PIO, I2C, PWM Output, and Interrupts.
 
 3. **Config file for customizing hardware interface**  
    I just checked and I realize that the existing firmware does something pretty similar with pinout.h, but the vibes still stand.
@@ -49,8 +53,8 @@ Video is too large, go watch it on the Notion page below
    
 ## Future Ideas to Implement
 
-- **I2C Data Collection**  
-  Collect I2C data either on the side or through PIO. I believe the sensing board has 4 I2C connections, which is too many.
+- **I2C Data Collection through PIO**  
+  Added regular I2C in main CPU context, but I believe the sensing board has 4 I2C connections, which is too many for a Pico without PIO.
 
 - **DMA Controller**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
@@ -68,6 +72,11 @@ Video is too large, go watch it on the Notion page below
 - **Debugging capabilities**  
   Look into picoprobe
 
+- **Remove Build Flags in Library**  
+  This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.
+  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now.
+  Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called.
+
 ## Resources
 - **What is Programmable I/O on Raspberry Pi Pico?**  
   [Read the article](https://magazine.raspberrypi.com/articles/what-is-programmable-i-o-on-raspberry-pi-pico)
@@ -79,7 +88,7 @@ Video is too large, go watch it on the Notion page below
   [Blog post by Greg Chadwick](https://gregchadwick.co.uk/blog/playing-with-the-pico-pt4/)
 
 - **For Beginner-Friendly Help**  
-  [Talk to me like I'm stupid](https://forums.raspberrypi.com/viewtopic.php?t=356489)
+  [Talk to me like I'm stupid about pull noblock](https://forums.raspberrypi.com/viewtopic.php?t=356489)
   
 ## Work on the Project
 
