@@ -5,7 +5,8 @@
 #include "MotorController.h"
 #include "LEDPIO.h"
 #include "Estop.h"
-#include "I2CSensor.h"
+#include "TempSensor.h"
+#include "DOFStick.h"
 
 class AppCore {
 public:
@@ -27,6 +28,7 @@ public:
 
         #ifdef HAS_SENSORS
             tempSensor.setup();
+            imu.setup();
         #endif
     }
 
@@ -44,7 +46,9 @@ public:
 
         #ifdef HAS_SENSORS
             temp = tempSensor.readData();
-            Serial.println(temp);
+            imu.readData();
+            Serial.println("\n\n");
+            // Serial.println(temp);
         #endif
         
         // Transfer the sensor or output value to LED blink
@@ -61,6 +65,8 @@ public:
             // Feed the PIO the new blinking value
             ledPIO.updateBlink(pwm_input);
         #endif
+
+        delay(1000);
     }
 
 private:
@@ -80,7 +86,8 @@ private:
     #endif
     
     #ifdef HAS_SENSORS
-        I2CSensor tempSensor;
-        uint8_t temp = 65;
+        TempSensor tempSensor;
+        uint8_t temp = 25;
+        DOFStick imu;
     #endif
 };

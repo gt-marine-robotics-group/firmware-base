@@ -6,13 +6,13 @@
 #include <Arduino.h>
 #include "config.h"
 #include <Wire.h>
-#include "Adafruit_Si7021.h"
+#include "SparkFun_Si7021_Breakout_Library.h"
 
-class I2CSensor{
+class TempSensor{
     public:
-        I2CSensor();
+        TempSensor();
 
-        Adafruit_Si7021 sensor = Adafruit_Si7021(&Wire1);
+        SI7021 sensor;
 
         void setup();
 
