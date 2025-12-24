@@ -6,32 +6,7 @@
 </video>
 Video is too large, go watch it on the Notion page below
 
-
-## Project Iterations
-
-1. **Blink**  
-   Simple LED blink functionality.
-   
-2. **Blink Pauses on GPIO Input**  
-   Blink pauses when there is a GPIO input change.
-
-3. **Add Motor Controller**  
-   Integrating a motor controller to control motor speeds.
-
-4. **Blink Tied to Motor Controller Speed**  
-   Blink speed now changes based on the motor controller speed.  
-   Test that there’s no need for feeding the state machine when empty (check pull no block).
-
-5. **E-Stop**  
-   Implement a CPU interrupt and then shorten the PIO pause to match the interrupt.  
-   Consider addressing latency issues associated with pausing only at the top of the cycle.
-
-6. **Object-Oriented Programming (OOP) Firmware Architecture**  
-   Use OOP style firmware as a proof of concept for proper structure.
-
-7. **Added I2C Sensor**  
-   For other board configuration, added a Temp/Humidity sensor to demonstrate using an I2C Sensor.
-   
+ 
 ## Highlights/Things to Note
 
 1. **PIO is fast, efficient, and partitioned**  
@@ -50,11 +25,38 @@ Video is too large, go watch it on the Notion page below
 
 4. **Easily change the constants**  
    Due to modular design, one can easily change constants specific to certain modules, such as the clock divider of the PIO.
+
+## Project Iterations
+
+1. **Blink**  
+   Simple LED blink functionality.
+   
+2. **Blink Pauses on GPIO Input**  
+   Blink pauses when there is a GPIO input change.
+
+3. **Add Motor Controller**  
+   Integrating a motor controller to control motor speeds.
+
+4. **Blink Tied to Motor Controller Speed**  
+   Blink speed now changes based on the motor controller speed.  
+   Test that there’s no need for feeding the state machine when empty (check pull no block).
+
+5. **E-Stop**  
+   Implement a CPU interrupt and shorten the PIO delay to match the interrupt (latter is deprecated).  
+   Consider addressing latency issues associated with pausing only at the top of the cycle.
+
+6. **Object-Oriented Programming (OOP) Firmware Architecture**  
+   Use OOP style firmware as a proof of concept for proper structure.
+
+7. **Added I2C Sensors**  
+   For other board configuration, added a Temp/Humidity sensor to demonstrate using an I2C Sensor.
+   Also added a second IMU (9DOF Stick) onto the same bus to ensure I2C is working fine.
+   Can easily switch between 2 board configurations (defined by build flags).
    
 ## Future Ideas to Implement
 
 - **I2C Data Collection through PIO**  
-  Added regular I2C in main CPU context, but I believe the sensing board has 4 I2C connections, which is too many for a Pico without PIO.
+  Added regular I2C devices in main CPU context, but I believe the sensing board has 4 I2C connections (which could probably be just 2 or even 1), but 4 is too many for a Pico without PIO.
 
 - **DMA Controller**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
@@ -75,7 +77,7 @@ Video is too large, go watch it on the Notion page below
 - **Remove Build Flags in Library**  
   This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.
   Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.
-  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called.
+  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
 
 ## Resources
 - **What is Programmable I/O on Raspberry Pi Pico?**  
