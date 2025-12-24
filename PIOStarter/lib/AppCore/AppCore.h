@@ -34,7 +34,7 @@ public:
 
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        #ifdef HAS_ESTOP // Might need to fix this later
+        #ifdef HAS_ESTOP // Might need to fix this later, but I think motors are the only thing E-stopped
             #ifdef HAS_MOTORS // if there is not an EStop consider using #else if (true) {
             if (!Estop::estopTriggered){
                 pwm = motor.spinMotor(config::PWM_OUT, analogRead(config::POT_IN));

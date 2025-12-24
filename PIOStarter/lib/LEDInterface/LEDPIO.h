@@ -4,6 +4,7 @@
 #include "config.h"
 #include "blink_input.pio.h"
 
+// Clock divider to set general blink speed
 static constexpr float PIO_CLK = 62500.0f;
 
 class LEDPIO{
