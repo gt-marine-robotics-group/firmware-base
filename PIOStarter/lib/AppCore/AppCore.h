@@ -7,6 +7,7 @@
 #include "Estop.h"
 #include "TempSensor.h"
 #include "DOFStick.h"
+#include "LEDMux.h"
 
 class AppCore {
 public:
@@ -24,6 +25,10 @@ public:
 
         #ifdef HAS_INDICATOR_LED
             ledPIO.setup();
+        #endif
+
+        #ifdef HAS_LED_MUX
+            ledMux.setup();
         #endif
 
         #ifdef HAS_SENSORS
@@ -66,7 +71,12 @@ public:
             ledPIO.updateBlink(pwm_input);
         #endif
 
-        delay(1000);
+        #ifdef HAS_LED_MUX
+            ledMux.updateLED(color);
+            // color = static_cast<LEDMux::Color>((static_cast<int>(color) + 1) % (config::LED_BUS_SIZE + 1));
+        #endif
+
+        delay(500);
     }
 
 private:
@@ -84,7 +94,12 @@ private:
         LEDPIO ledPIO;
         uint8_t pwm_input = 25;
     #endif
-    
+
+    #ifdef HAS_LED_MUX
+        LEDMux ledMux;
+        LEDMux::Color color = LEDMux::Color::Off;
+    #endif
+
     #ifdef HAS_SENSORS
         TempSensor tempSensor;
         uint8_t temp = 25;

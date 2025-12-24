@@ -8,6 +8,7 @@ MotorController::MotorController() {
 
 }
 
+// TODO: instantiate variable amounts of PWM outputs (defined in config.h)
 void MotorController::setup(){
     pinMode(config::PWM_OUT, OUTPUT);
     pinMode(config::AI1, OUTPUT);
@@ -22,6 +23,7 @@ bool MotorController::estop(){
 }
 
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
+// Make return a bool or void cuz this was originally supposed to be feedback but not really necessary
 uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
     int32_t delta = static_cast<int32_t>(pot) - ADC_CENTER;
 
@@ -50,6 +52,10 @@ uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
     return 0;
 }
 
+// TODO: Changes to consider
+// Pull the PWMs from a defined list stored in private in this class
+// Remove results, I wanted to use it to store returned values, but I don't think that matters here
+// Independent dropper/arm control
 void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, uint8_t count) {
     for (uint8_t i = 0; i < count; i++) {
         results[i] = spinMotor(pins[i], PWMs[i]);
