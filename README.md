@@ -84,7 +84,7 @@ Video is too large, go watch it on the Notion page below
 - **Add the Protobuf and ROS Handlers**  
   See previous bullet point
 
-- **Add the Protobuf and ROS Handlers**  
+- **Merge in ROS Handlers from old/skeleton code**  
   See previous bullet point, but also if I'm completely honest, I don't really understand the RC framework at the moment. Like I can see what it's doing, but I don't want to dive into the weeds of it.
   
 - **Debugging capabilities**  
