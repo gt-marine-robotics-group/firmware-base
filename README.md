@@ -6,6 +6,25 @@
 </video>
 Video is too large, go watch it on the Notion page below
 
+ 
+## Highlights/Things to Note
+
+1. **PIO is fast, efficient, and partitioned**  
+   While the E-stop for the LED has some latency due to clock cycling, the speed at which it resumed shows how fast it can be.
+   Furthermore, you can abstract passive tasks like LED management to PIO to save CPU space for important things like the motor controller.
+   The PIO still runs even when the CPU stops, unless you short the interrupt pins together. This allows you to save states.
+   Lastly, you can load in values for the PIO so it still has the benefits of being a regular function.
+   
+2. **Customizable Firmware Architecture**  
+   The organization into a central app and several modules allows for the app to pick and choose which features to use.
+   You can still keep central features like an E-Stop while deciding what sensors and peripherals you want.
+   This sample project has an example of every type of interface except SPI: PIO, I2C, PWM Output, and Interrupts.
+
+3. **Config file for customizing hardware interface**  
+   I just checked and I realize that the existing firmware does something pretty similar with pinout.h, but the vibes still stand.
+
+4. **Easily change the constants**  
+   Due to modular design, one can easily change constants specific to certain modules, such as the clock divider of the PIO.
 
 ## Project Iterations
 
@@ -34,29 +53,10 @@ Video is too large, go watch it on the Notion page below
    Also added a second IMU (9DOF Stick) onto the same bus to ensure I2C is working fine.
    Can easily switch between 2 board configurations (defined by build flags).
    
-## Highlights/Things to Note
-
-1. **PIO is fast, efficient, and partitioned**  
-   While the E-stop for the LED has some latency due to clock cycling, the speed at which it resumed shows how fast it can be.
-   Furthermore, you can abstract passive tasks like LED management to PIO to save CPU space for important things like the motor controller.
-   The PIO still runs even when the CPU stops, unless you short the interrupt pins together. This allows you to save states.
-   Lastly, you can load in values for the PIO so it still has the benefits of being a regular function.
-   
-2. **Customizable Firmware Architecture**  
-   The organization into a central app and several modules allows for the app to pick and choose which features to use.
-   You can still keep central features like an E-Stop while deciding what sensors and peripherals you want.
-   This sample project has an example of every type of interface except SPI: PIO, I2C, PWM Output, and Interrupts.
-
-3. **Config file for customizing hardware interface**  
-   I just checked and I realize that the existing firmware does something pretty similar with pinout.h, but the vibes still stand.
-
-4. **Easily change the constants**  
-   Due to modular design, one can easily change constants specific to certain modules, such as the clock divider of the PIO.
-   
 ## Future Ideas to Implement
 
 - **I2C Data Collection through PIO**  
-  Added regular I2C in main CPU context, but I believe the sensing board has 4 I2C connections, which is too many for a Pico without PIO.
+  Added regular I2C devices in main CPU context, but I believe the sensing board has 4 I2C connections (which could probably be just 2 or even 1), but 4 is too many for a Pico without PIO.
 
 - **DMA Controller**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
