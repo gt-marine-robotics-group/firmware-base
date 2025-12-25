@@ -1,43 +1,101 @@
-
+# Library Directory
 This directory is intended for project specific (private) libraries.
 PlatformIO will compile them to static libraries and link into the executable file.
 
 The source code of each library should be placed in a separate directory
 ("lib/your_library_name/[Code]").
 
-For example, see the structure of the following example libraries `Foo` and `Bar`:
+Current Project Directory:
 
-|--lib
-|  |
-|  |--Bar
-|  |  |--docs
-|  |  |--examples
-|  |  |--src
-|  |     |- Bar.c
-|  |     |- Bar.h
-|  |  |- library.json (optional. for custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
-|  |
-|  |--Foo
-|  |  |- Foo.c
-|  |  |- Foo.h
-|  |
-|  |- README --> THIS FILE
-|
-|- platformio.ini
-|--src
-   |- main.c
+lib/  
+├── AppCore/  
+│   └── AppCore.h  
+│  
+├── Estop/  
+│   └── Estop.h  
+│  
+├── LEDMux/  
+│   ├── led_mux.pio  
+│   ├── led_mux.pio.h  
+│   ├── LEDMux.cpp  
+│   └── LEDMux.h  
+│  
+├── MotorControl/  
+│   ├── MotorController.cpp  
+│   └── MotorController.h  
+│  
+├── PIOExamples/  
+│   └── (example PIO code and experiments)  
+│  
+├── Sensors/  
+│   ├── DOFStick.cpp  
+│   ├── DOFStick.h  
+│   ├── TempSensor.cpp  
+│   └── TempSensor.h  
+│  
+├── VariableBlink/  
+│   ├── blink_input.pio  
+│   ├── blink_input.pio.h  
+│   ├── LEDPIO.cpp  
+│   └── LEDPIO.h  
+│  
+├── README --> THIS FILE  
+└── README copy  
+# Project Modules 
+This repository is organized into modular components, separating hardware abstractions, core logic, and reference implementations.
 
-Example contents of `src/main.c` using Foo and Bar:
-```
-#include <Foo.h>
-#include <Bar.h>
 
-int main (void)
-{
-  ...
-}
+## AppCore
 
-```
+Contains the central application interfaces.  
+Defines logical flow of the application
+
+## Estop
+
+Module to handle emergency stop via interrupts  
+Provides critical interfaces for immediately halting system operations in response to safety triggers.
+
+## MotorControl
+
+Implementation for motor drivers and other controlled outputs  
+Encapsulates the control logic for movement and actuation.
+
+## Sensors
+
+Drivers and abstractions for environmental and input data.  
+Interfacing via SPI or I2C in the main CPU context.
+
+### DOFStick 
+Interface for multi-axis input devices.  
+
+### TempSensor 
+Support for temperature and humidity measurement and monitoring.
+
+## PIO (Programmable I/O) Implementations
+### LEDMux
+
+High-performance LED multiplexing using the PIO peripheral.  
+
+Uses .pio files for assembly-level timing and .cpp/.h for the high-level C++ API.
+
+### VariableBlink
+
+A practical example of input-driven timing.
+
+Demonstrates real-time integration between C++ logic and PIO state machines.
+
+### PIOExamples
+
+A collection of experimental and reference implementations for developers to use as a sandbox.
+
+Inital examples will be PIO I2C interface and PIO DMA controller
+
+
+
+
+  
+  
+# Library Dependency Finder
 
 The PlatformIO Library Dependency Finder will find automatically dependent
 libraries by scanning project source files.
