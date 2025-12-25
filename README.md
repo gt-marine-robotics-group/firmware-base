@@ -59,6 +59,9 @@ Video is too large, go watch it on the Notion page below
 8. **LED Mux**  
    Given that most boards have an LED interface, added a simple led mux package to instantiate and selectively turn on GPIO pins.
    Might modify the masking logic to give more control since it's currently just a case-switch statement
+
+9. **Better Comments/Documentation**
+   Added Doxygen Comments to literally every single file. Still might need some improved clarity, especially regarding logical implementation. 
    
 ## In-progress/Future Ideas to Implement
 
@@ -78,7 +81,7 @@ Video is too large, go watch it on the Notion page below
   [PIO UART TX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_tx)  
 
 - **Better Comments/Documentation**  
-  I vibed some of these comments and debugging, hence the weird syntax and arrow symbols, so need to write real comments to actually make this easy to understand.
+  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation.
 
 - **Make this work for our firmware**  
   This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
