@@ -10,15 +10,15 @@ Video is too large, go watch it on the Notion page below
 ## Highlights/Things to Note
 
 1. **PIO is fast, efficient, and partitioned**  
-   While the E-stop for the LED has some latency due to clock cycling, the speed at which it resumed shows how fast it can be.
-   Furthermore, you can abstract passive tasks like LED management to PIO to save CPU space for important things like the motor controller.
-   The PIO still runs even when the CPU stops, unless you short the interrupt pins together. This allows you to save states.
-   Lastly, you can load in values for the PIO so it still has the benefits of being a regular function.
+   While the E-stop for the LED has some latency due to clock cycling, the speed at which it resumed shows how fast it can be.  
+   Furthermore, you can abstract passive tasks like LED management to PIO to save CPU space for important things like the motor controller.  
+   The PIO still runs even when the CPU stops, unless you short the interrupt pins together. This allows you to save states.  
+   Lastly, you can load in values for the PIO so it still has the benefits of being a regular function.  
    
 2. **Customizable Firmware Architecture**  
-   The organization into a central app and several modules allows for the app to pick and choose which features to use.
-   You can still keep central features like an E-Stop while deciding what sensors and peripherals you want.
-   This sample project has an example of every type of interface except SPI: PIO, I2C, PWM Output, and Interrupts.
+   The organization into a central app and several modules allows for the app to pick and choose which features to use.  
+   You can still keep central features like an E-Stop while deciding what sensors and peripherals you want.  
+   This sample project has an example of every type of interface except SPI: PIO, I2C, PWM Output, and Interrupts.  
 
 3. **Config file for customizing hardware interface**  
    I just checked and I realize that the existing firmware does something pretty similar with pinout.h, but the vibes still stand.
@@ -49,17 +49,30 @@ Video is too large, go watch it on the Notion page below
    Use OOP style firmware as a proof of concept for proper structure.
 
 7. **Added I2C Sensors**  
-   For other board configuration, added a Temp/Humidity sensor to demonstrate using an I2C Sensor.
-   Also added a second IMU (9DOF Stick) onto the same bus to ensure I2C is working fine.
+   For other board configuration, added a Temp/Humidity sensor to demonstrate using an I2C Sensor.  
+   Also added a second IMU (9DOF Stick) onto the same bus to ensure I2C is working fine.  
    Can easily switch between 2 board configurations (defined by build flags).
-   
-## Future Ideas to Implement
 
+8. **LED Mux**  
+   Given that most boards have an LED interface, added a simple led mux package to instantiate and selectively turn on GPIO pins.
+   Might modify the masking logic to give more control since it's currently just a case-switch statement
+   
+## In-progress/Future Ideas to Implement
+
+- **SPI Sensor**  
+  This one is pretty easy, but I don't actually have an SPI senosr with me during break. Should take like 10 minutes to set up, since there are plenty of examples, and I also have reference code from ECE4180 if needed. More interesting would be using PIO for this.
+  
 - **I2C Data Collection through PIO**  
   Added regular I2C devices in main CPU context, but I believe the sensing board has 4 I2C connections (which could probably be just 2 or even 1), but 4 is too many for a Pico without PIO.
+  There is a pretty reliable-looking example on the Pico Examples GitHub: 
+  [PIO I2C](https://github.com/raspberrypi/pico-examples/tree/master/pio/i2c)
 
 - **DMA Controller**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
+  There's an example using UART to do it, so we should proably start there and then port it over to SPI/I2C:  
+  [PIO UART DMA](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_dma) 
+  [PIO UART RX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_rx) 
+  [PIO UART TX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_tx)  
 
 - **Better Comments/Documentation**  
   I vibed some of these comments and debugging, hence the weird syntax and arrow symbols, so need to write real comments to actually make this easy to understand.
@@ -71,13 +84,16 @@ Video is too large, go watch it on the Notion page below
 - **Add the Protobuf and ROS Handlers**  
   See previous bullet point
 
+- **Merge in ROS Handlers from old/skeleton code**  
+  See previous bullet point, but also if I'm completely honest, I don't really understand the RC framework at the moment. Like I can see what it's doing, but I don't want to dive into the weeds of it.
+  
 - **Debugging capabilities**  
-  Look into picoprobe
+  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
 
 - **Remove Build Flags in Library**  
-  This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.
-  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.
-  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
+  This removes the whole shove bunch of build flags in a big main file, but still requires build flags because the compiler tries to compile all files in lib.  
+  Theoretically Dead Code Elimination means you shouldn't need to worry about that, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
+  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.  
 
 ## Resources
 - **What is Programmable I/O on Raspberry Pi Pico?**  
