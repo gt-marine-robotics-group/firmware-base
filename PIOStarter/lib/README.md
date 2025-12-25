@@ -72,6 +72,8 @@ Interface for multi-axis input devices.
 Support for temperature and humidity measurement and monitoring.
 
 ## PIO (Programmable I/O) Implementations
+Due to the fact that LDF only searches top-level folders, these are individually stored in their own folders
+
 ### LEDMux
 
 High-performance LED multiplexing using the PIO peripheral.  
@@ -102,3 +104,4 @@ libraries by scanning project source files.
 
 More information about PlatformIO Library Dependency Finder
 - https://docs.platformio.org/page/librarymanager/ldf.html
+
