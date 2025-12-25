@@ -26,7 +26,10 @@ Video is too large, go watch it on the Notion page below
 4. **Easily change the constants**  
    Due to modular design, one can easily change constants specific to certain modules, such as the clock divider of the PIO.
 
-## Project Iterations
+## Project Overview
+[Current Project Directory](https://github.com/gt-marine-robotics-group/firmware-base/blob/main/PIOStarter/lib/README.md)  
+
+### Project Iterations  
 
 1. **Blink**  
    Simple LED blink functionality.
