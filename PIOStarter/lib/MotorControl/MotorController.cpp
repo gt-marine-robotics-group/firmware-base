@@ -1,4 +1,21 @@
-#ifdef HAS_MOTORS
+/**
+ * @file MotorController.cpp
+ * @author Jason Hsiao
+ * @date 12/24/2025
+ * @version 1.0
+ *
+ * @brief Implementation of Motor Controller.
+ *
+ * This file allows you to initialize and control PWM outputs,
+ * essentially acting as a motor controller.
+ * 
+ * @todo This was designed for the SparkFun H-Bridge Motor Driver, 
+ * so this will need to be converted to work with ESCs, but the core 
+ * concept of outputting PWMs remains. 
+ * @see config.h for the hardware definitions like GPIO mapping
+ */
+
+ #ifdef HAS_MOTORS
 
 #include "MotorController.h"
 
@@ -25,10 +42,10 @@ bool MotorController::estop(){
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
 // Make return a bool or void cuz this was originally supposed to be feedback but not really necessary
 uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
-    int32_t delta = static_cast<int32_t>(pot) - ADC_CENTER;
+    int32_t delta = static_cast<int32_t>(pot) - MotorController::ADC_CENTER;
 
     // Deadband that way you aren't driving the motors super slow, which isn't great
-    if (abs(delta) < DEADBAND) {
+    if (abs(delta) < MotorController::DEADBAND) {
         digitalWrite(config::AI1, LOW);
         digitalWrite(config::AI2, LOW);
         analogWrite(config::PWM_OUT, 0);
@@ -38,10 +55,10 @@ uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
         bool forward = (delta > 0);
 
         // Scale magnitude, converts difference from the pot center to a reasonable PWM value
-        uint8_t pwm = (static_cast<uint32_t>(abs(delta)) * PWM_MAX) / ADC_CENTER;
+        uint8_t pwm = (static_cast<uint32_t>(abs(delta)) * MotorController::PWM_MAX) / MotorController::ADC_CENTER;
 
         // Safety clamp
-        if (pwm > PWM_MAX) pwm = PWM_MAX;
+        if (pwm > MotorController::PWM_MAX) pwm = MotorController::PWM_MAX;
 
         // Drive H-bridge
         digitalWrite(config::AI1, forward ? HIGH : LOW);

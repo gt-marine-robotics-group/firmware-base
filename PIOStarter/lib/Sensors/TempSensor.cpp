@@ -1,3 +1,18 @@
+/**
+ * @file TempSensor.cpp
+ * @author Jason Hsiao
+ * @date 12/24/2025
+ * @version 1.0
+ *
+ * @brief Implementation of Temp and Humid Sensor Interface.
+ *
+ * This file holds the functions for instantiating, setting up, 
+ * and reading/printing the sensor data.
+ * 
+ * @todo See if there is a way to directly interface with Protobuf or PIO DMA
+ * @see config.h for the hardware definitions like GPIO mapping
+ */
+
 #ifdef HAS_SENSORS
 
 #include "TempSensor.h"

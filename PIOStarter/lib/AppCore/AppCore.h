@@ -1,5 +1,18 @@
-// lib/AppCore/AppCore.h
 #pragma once
+
+/**
+ * @file AppCore.h
+ * @author Jason Hsiao
+ * @date 12/24/2025
+ * @version 1.0
+ *
+ * @brief Header (and implementation) for AppCore.
+ *
+ * This file controls the logical flow of the board and the 
+ * instantiation and function calls of different modules.
+ * @see config.h for the hardware definitions like GPIO mapping 
+ * and platform.ini for build flag definitions.
+ */
 
 #include "config.h"
 #include "MotorController.h"
@@ -9,8 +22,20 @@
 #include "DOFStick.h"
 #include "LEDMux.h"
 
+/**
+ * @brief 
+ * Acts as centralized logical flow for the application.
+ * This class is where we actually implement logic and use our modules. 
+ * @note Is the equivalent of the main.cpp in most applications, but is abstracted for modularity 
+ * and customizability.
+ */
 class AppCore {
 public:
+    /**
+     * @brief Set-up all of our modules and the Serial monitor.
+     * @note Initializes all the modules just like setup() in Arduino
+     * @todo Maybe consider a name change then lol
+     */
     void begin() {
         Serial.begin(115200);
         
@@ -37,6 +62,11 @@ public:
         #endif
     }
 
+    /**
+     * @brief Main loop for all of our modules.
+     * @note Do all of your logic here just like loop() in Arduino.
+     * @todo Okay might actually need to change these names
+     */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
         #ifdef HAS_ESTOP // Might need to fix this later, but I think motors are the only thing E-stopped
@@ -73,7 +103,7 @@ public:
 
         #ifdef HAS_LED_MUX
             ledMux.updateLED(color);
-            // color = static_cast<LEDMux::Color>((static_cast<int>(color) + 1) % (config::LED_BUS_SIZE + 1));
+            // color = static_cast<config::Color>((static_cast<int>(color) + 1) % (config::LED_BUS_SIZE + 1));
         #endif
 
         delay(500);
@@ -97,7 +127,7 @@ private:
 
     #ifdef HAS_LED_MUX
         LEDMux ledMux;
-        LEDMux::Color color = LEDMux::Color::Off;
+        config::Color color = config::Color::Off;
     #endif
 
     #ifdef HAS_SENSORS

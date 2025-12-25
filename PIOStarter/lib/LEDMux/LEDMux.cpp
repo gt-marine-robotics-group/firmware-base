@@ -1,3 +1,18 @@
+/**
+ * @file LEDMux.cpp
+ * @author Jason Hsiao
+ * @date 12/24/2025
+ * @version 1.0
+ *
+ * @brief Implementation of the PIO-based LED Muxing logic.
+ *
+ * This file implements the hardware-level interaction with the RP2040 PIO 
+ * block. It handles the loading of the 'led_mux.pio' program and manages 
+ * the TX FIFO pushes. 
+ * @note This implementation assumes a 4-bit mask is passed to the OSR.
+ * @see LEDMux.h for the public API and configuration constants.
+ */
+
 #ifdef HAS_LED_MUX
 
 #include "LEDMux.h"
@@ -24,7 +39,7 @@ void LEDMux::setup(){
     pio_sm_set_consecutive_pindirs(pio, sm, config::PIN_BASE, config::LED_BUS_SIZE, true);
 
     // Set clock divider (same as before)
-    sm_config_set_clkdiv(&c, MUX_PIO_CLK);
+    sm_config_set_clkdiv(&c, config::MUX_PIO_CLK);
 
     pio_sm_init(pio, sm, offset, &c);
     pio_sm_set_enabled(pio, sm, true);
@@ -40,22 +55,21 @@ bool LEDMux::estop(){
 }
 
 // Drop the corresponding bit mask into the state machine
-void LEDMux::updateLED(Color color) {
-    // More elegant solution is to use pio_sm_put(pio, sm, 1 << static_cast<int>(color)) or something like that
+void LEDMux::updateLED(config::Color color) {
     switch (color) {
-        case Color::Red:
+        case config::Color::Red:
             pio_sm_put(pio, sm, 0b0001);
             break;
-        case Color::Yellow:
+        case config::Color::Yellow:
             pio_sm_put(pio, sm, 0b0010);
             break;
-        case Color::Green:
+        case config::Color::Green:
             pio_sm_put(pio, sm, 0b0100);
             break;
-        case Color::Blue: 
+        case config::Color::Blue: 
             pio_sm_put(pio, sm, 0b1000);
             break;
-        case Color::Off: 
+        case config::Color::Off: 
             pio_sm_put(pio, sm, 0b0000);
             break;
         default:
@@ -63,6 +77,13 @@ void LEDMux::updateLED(Color color) {
             break;
     }
 }
+
+// More elegant solution is to use pio_sm_put(pio, sm, 1 << static_cast<int>(color)) or something like that
+void LEDMux::updateLEDs(uint8_t colors){
+    constexpr uint32_t mask = (1u << config::LED_BUS_SIZE) - 1; // Create a mask that is length of the # of pins
+    pio_sm_put(pio, sm, (mask & colors));                       // apparently it is cast to a uint32_t anyhow
+}
+
 
 #endif
 
