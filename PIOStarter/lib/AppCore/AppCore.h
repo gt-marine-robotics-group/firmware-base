@@ -8,7 +8,7 @@
  *
  * @brief Header (and implementation) for AppCore.
  *
- * This file controls the logical flow of the board and the 
+ * This file controls the logical flow of all board possibilities and the 
  * instantiation and function calls of different modules.
  * @see config.h for the hardware definitions like GPIO mapping 
  * and platform.ini for build flag definitions.

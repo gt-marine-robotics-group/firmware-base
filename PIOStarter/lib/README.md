@@ -10,9 +10,15 @@ Current Project Directory:
 lib/  
 ├── AppCore/  
 │   └── AppCore.h  
+│
+├── Boards/  
+│   └── PrestoBoard.h
+│   └── SensorBoard.h  
 │  
 ├── Estop/  
 │   └── Estop.h  
+│   └── WatchdogEstop.h (planned)
+│   └── InternalEstop.h (planned)
 │  
 ├── LEDMux/  
 │   ├── led_mux.pio  
@@ -26,6 +32,12 @@ lib/
 │  
 ├── PIOExamples/  
 │   └── (example PIO code and experiments)  
+│
+├── PIOInterfaces/  
+│   └── (our PIO interfaces for SPI, DMA, and/or I2C)  
+│  
+├── Protobuf/  
+│   └── (Protobuf message packers and senders) 
 │  
 ├── Sensors/  
 │   ├── DOFStick.cpp  
@@ -40,7 +52,8 @@ lib/
 │   └── LEDPIO.h  
 │  
 ├── README --> THIS FILE  
-└── README copy  
+└── README copy  (the original PlatformIO REadME)  
+
 # Project Modules 
 This repository is organized into modular components, separating hardware abstractions, core logic, and reference implementations.
 
@@ -49,6 +62,12 @@ This repository is organized into modular components, separating hardware abstra
 
 Contains the central application interfaces.  
 Defines logical flow of the application
+
+## Boards
+
+An alternative to AppCore, this makes our central application interfaces board specific.  
+Defines logical flow of each individual board, meaning we need less build flags.
+Need to add optionality between RTOS and superloop.
 
 ## Estop
 
@@ -82,7 +101,7 @@ Uses .pio files for assembly-level timing and .cpp/.h for the high-level C++ API
 
 ### VariableBlink
 
-A practical example of input-driven timing.
+A practical example of input-driven timing using PIO peripheral.
 
 Demonstrates real-time integration between C++ logic and PIO state machines.
 

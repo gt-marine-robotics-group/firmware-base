@@ -18,7 +18,16 @@
 #include "AppCore.h"
 
 // This is just the main test, but can eventually be something like presto for clarity
-AppCore myApp;
+// AppCore myApp;
+
+// Alternatively, we could try this (honestly I prefer this):
+#ifdef BOARD_ALPHA
+    #include "PrestoBoard.h"
+    PrestoBoard myApp;
+#elifdef BOARD_BETA
+    #include "SensorBoard.h"
+    SensorBoard myApp;
+#endif
 
 // Don't do anything here, try and configure in AppCore for maximum flexibility and cleanliness
 void setup() {

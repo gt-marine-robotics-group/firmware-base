@@ -20,6 +20,8 @@
  * @namespace config
  * @brief Contains all hardware-specific constants like pin mappings and bus addresses.
  * @details Centralizing these values allows for easy porting between different board revisions.
+ * @todo Consider only keeping pin definitions here and implementing true modularity by encapsulating 
+ * object specific features
  */
 namespace config {
     // Pinout (Pin Definitions)
@@ -54,6 +56,7 @@ namespace config {
             Blue = 4, 
             Off = 0
         };   
+        // This enum is for setting multiple LEDs (still in development)
         enum Colors : uint8_t {                         ///< Test Enum for use with updateLEDs()
             Red = 1 << 0,                               ///< 0b0001
             Yellow = 1 << 1,                            ///< 0b0010

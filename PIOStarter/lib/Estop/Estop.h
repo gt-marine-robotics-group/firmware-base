@@ -19,6 +19,11 @@
  * @brief 
  * This class is the module that represents the E-stop subsystem.
  * @note Only compiled if the HAS_ESTOP flag is defined in the build environment.
+ * @note If internal signal, just output to a pin tied to interrupt pin or manually throw flag.
+ * @todo This E-Stop is tied to a GPIO pin since that's the easiest way to do it
+ * in Arduino and would read a physical E-Stop switch, the next goals are implementing 
+ * a watchdog timer for lost connection, and the ultimate goal is register-level interrupt.
+ * You can rip the RC/ROS E-stop reading code from the old firmware then.
  */
 class Estop{
     public:
