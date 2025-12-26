@@ -40,7 +40,7 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   Sensor Interface featuring
   - 3 I2C Sensors (BME280, INA219, Blue Robotics Pressure Sensor)
   - Digital Leak Sensors
-  - NeoPixel RGB LED (not yet addressed)
+  - NeoPixel RGB LED
 
 ## In-progress/Future Ideas to Implement
 The current list of project goals. Feel free to add or handle these, but if you take something off the list, please add it to the Project Iterations section below, so we can easily keep track for documentation and progress purposes. These are grouped into three categories and ordered by difficulty: Advanced Features, Implementation, and Framework & Architecture Design.
@@ -93,13 +93,13 @@ This codebase is only a proof-of-concept, we need to actually do the hard part n
  This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
  
 - **Better Comments/Documentation - BEGINNER**  
-  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation.
+  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
 
 - **Draw the line between modularity and centralization - BEGINNER**  
-  Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h
+  Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
 
 - **RTOS - BEGINNER/INTERMEDIATE**  
-  Everything is currently super looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
+  Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
 
 - **Memory and Packet Design - INTERMEDIATE**  
   Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication.
