@@ -51,6 +51,7 @@ This is essentially stretch goals or developing new features. Our basic framewor
 - **NeoPixel PIO Controller - BEGINNER/INTERMEDIATE**  
   Implementing NeoPixel control through PIO. Should be the easiest of all PIO projects, but requires some understanding of clocking and assembly. Also maybe design a good interface for using the NeoPixel (like encoding different modes or adding pass-through).
   [NeoPixel information encoding]([https://github.com/raspberrypi/pico-examples/tree/master/pio/spi](https://forums.adafruit.com/viewtopic.php?t=195794))
+  [How to use Adafruit NeoPixel library](https://www.instructables.com/Neopixels-How-Do-They-Work/)
   
 - **SPI Data collection through PIO - INTERMEDIATE**  
   Implementing SPI Data collection through PIO. Should be the easiest between SPI/I2C/DMA, but not easy at all.
