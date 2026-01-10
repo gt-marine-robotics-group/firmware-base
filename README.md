@@ -45,8 +45,58 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
 ## In-progress/Future Ideas to Implement
 The current list of project goals. Feel free to add or handle these, but if you take something off the list, please add it to the Project Iterations section below, so we can easily keep track for documentation and progress purposes. These are grouped into three categories and ordered by difficulty: Advanced Features, Implementation, and Framework & Architecture Design.
 
+### Implementation  
+This codebase is only a proof-of-concept, we need to actually do the annoying part now and use this framework to implement our specific features. A helpful resource is the skeleton code that Mitchell originally laid out when we were rushing to meet deadlines (linked below).
+#### Roadmap: <br> Decision-making and Familiarize with New Framework (1-2 weeks) <br> Breadboarding done by Early February (3 weeks) <br> Tested on actual boards by end of February (6 weeks) <br>
+
+- **SPI Sensor - BEGINNER**  
+  The advanced goal is to make a fancier SPI communication interface using PIO. This one is just set up an SPI sensor and is pretty easy, but I don't actually have an SPI sensor with me during break. Should take like 10 minutes to set up since there are plenty of examples, and I also have reference code from ECE4180 if needed. If I'm being honest, I'm not sure if we have any SPI sensors, but it's good to keep in our back pocket.
+  
+- **Motor Controller - BEGINNER**  
+  I have this mostly laid out, is just some GPIO mapping and tuning the constants. Could become INTERMEDIATE if you want to do some fun stuff with structs and Protobuf.
+  
+- **Make this work for our firmware - INTERMEDIATE**  
+  This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
+  See Notion page below for list of tasks.
+
+- **Torpedo - INTERMEDIATE**  
+  Not included in this firmware base but just for record-keeping
+  
+- **Add the Protobuf and ROS Handlers - INTERMEDIATE/ADVANCED**  
+  Make a designated package for Protobuf packing and interfacing with ROS.
+
+- **Merge in ROS Handlers from old/skeleton code - INTERMEDIATE/ADVANCED**  
+  See previous bullet point, but also if I'm completely honest, I only somewhat understand the RC Framework. Like I can see what it's doing, but I don't want to dive into the weeds of it. Also clean up the syntax cuz it's a little messy.
+
+
+ ### Framework & Architecture Design
+ This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
+ #### Roadmap: <br> Higher-level decision-making and planning (assign tasks) (1-2 weeks) <br> INTERMEDIATE needs significant progress by start of March (2 months) <br> ADVANCED is for funsies and food for thought (don't care, but prob semester) <br>
+ 
+- **Better Comments/Documentation - BEGINNER**  
+  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
+
+- **Draw the line between modularity and centralization - BEGINNER**  
+  Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
+
+- **RTOS - BEGINNER/INTERMEDIATE**  
+  Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
+
+- **Memory and Packet Design - INTERMEDIATE**  
+  Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication.
+
+- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
+  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
+
+- **Further compiler related considerations - ADVANCED**  
+    Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
+  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
+  The key to all of this seems to be in how the LDF scans the libraries to find dependencies. On that note, althought ChatGPT says it's impossible, I really want to nest my folders in the lib folder but it doesn't work.
+  If we really want more control, we can switch to CMake, but that seems like way too much work.
+
 ### Advanced Features  
 This is essentially stretch goals or developing new features. Our basic framework covers simple firmware features, but given the cool possibilities enabled by the Pico, this is where we puruse stretch goals with PIO, DMA, and Protobuf.
+#### Roadmap: <br> R&D project so when possible (Semester) <br> <br> Ideal: <br> INTERMEDIATE done by Spring Break (2.5 months) <br> Significant progress on first 2 ADVANCED by end of semester (4 months) <br> Last 2 ADVANCED next semester - I'll have graduated by then rip
 
 - **NeoPixel PIO Controller - BEGINNER/INTERMEDIATE**  
   Implementing NeoPixel control through PIO. Should be the easiest of all PIO projects, but requires some understanding of clocking and assembly. Also maybe design a good interface for using the NeoPixel (like encoding different modes or adding pass-through).
@@ -71,52 +121,11 @@ This is essentially stretch goals or developing new features. Our basic framewor
 
 - **I2C DMA through PIO - ADVANCED**  
   This the previous two combined to make your life an absolute nightmare. Should be fun. :)
+  Endgoal is that the PIO formats the data into the right structure, which can basically be streamed through the RAM buffer where it gets serialized and then outputted to the USB. Absolute madness though.
 
 - **Embedded Control/ML - ADVANCED**  
   Assuming we get through the PIO gauntlet above, we have now freed up a signficant amount of compute/processing power on our main CPU, as PIO is handling everything. This can be used for real-time embedded machine learning, control, and data processing (including error handling) applications. Will be a lot of fun if we can get that far.
-
-### Implementation  
-This codebase is only a proof-of-concept, we need to actually do the hard part now and use this framework to implement our specific features. A helpful resource is the skeleton code that Mitchell originally laid out when we were rushing to meet deadlines.
-
-- **SPI Sensor - BEGINNER**  
-  The advanced goal is to make a fancier SPI communication interface using PIO. This one is just set up an SPI sensor and is pretty easy, but I don't actually have an SPI sensor with me during break. Should take like 10 minutes to set up since there are plenty of examples, and I also have reference code from ECE4180 if needed. If I'm being honest, I'm not sure if we have any SPI sensors, but it's good to keep in our back pocket.
-  
-- **Motor Controller - BEGINNER**  
-  I have this mostly laid out, is just some GPIO mapping and tuning the constants. Could become INTERMEDIATE if you want to do some fun stuff with structs and Protobuf.
-  
-- **Make this work for our firmware - INTERMEDIATE**  
-  This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
-  See Notion page below for list of tasks.
-  
-- **Add the Protobuf and ROS Handlers - INTERMEDIATE/ADVANCED**  
-  Make a designated package for Protobuf packing and interfacing with ROS.
-
-- **Merge in ROS Handlers from old/skeleton code - INTERMEDIATE/ADVANCED**  
-  See previous bullet point, but also if I'm completely honest, I only somewhat understand the RC Framework. Like I can see what it's doing, but I don't want to dive into the weeds of it. Also clean up the syntax cuz it's a little messy.
-
- ### Framework & Architecture Design
- This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
- 
-- **Better Comments/Documentation - BEGINNER**  
-  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
-
-- **Draw the line between modularity and centralization - BEGINNER**  
-  Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
-
-- **RTOS - BEGINNER/INTERMEDIATE**  
-  Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
-
-- **Memory and Packet Design - INTERMEDIATE**  
-  Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication.
-
-- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
-  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
-
-- **Further compiler related considerations - ADVANCED**  
-    Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
-  Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
-  The key to all of this seems to be in how the LDF scans the libraries to find dependencies. On that note, althought ChatGPT says it's impossible, I really want to nest my folders in the lib folder but it doesn't work.
-  If we really want more control, we can switch to CMake, but that seems like way too much work.
+  JASON'S PET PROJECT: Pool resources to accomplish distributed compute :)
 
 
 ## Project Iterations  
