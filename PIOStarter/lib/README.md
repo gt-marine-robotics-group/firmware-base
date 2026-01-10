@@ -73,6 +73,7 @@ Need to add optionality between RTOS and superloop.
 
 Module to handle emergency stop via interrupts  
 Provides critical interfaces for immediately halting system operations in response to safety triggers.
+Additional File for handling leak sensors, since this also has it's own EStop situation, but remarkably similar since they're both just GPIO signals that we can just have 2 Estop objects.
 
 ## MotorControl
 

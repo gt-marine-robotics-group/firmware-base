@@ -8,7 +8,7 @@
  *
  * @brief Header for using NeoPixel Status Light.
  *
- * @note This code is the lab code from ECE4180,I know that it works, 
+ * @note This code is the lab code from ECE4180, I know that it works, 
  * but don't know if this implementation is fine.
  * @see config.h for the hardware definitions like GPIO mapping and 
  * tuned clock dividers.
