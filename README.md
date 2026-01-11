@@ -89,10 +89,11 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
   Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
 
 - **Further compiler related considerations - ADVANCED**  
-    Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
+  Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
   Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
   The key to all of this seems to be in how the LDF scans the libraries to find dependencies. On that note, althought ChatGPT says it's impossible, I really want to nest my folders in the lib folder but it doesn't work.
   If we really want more control, we can switch to CMake, but that seems like way too much work.
+  Maybe for beginners we can also convert this framework into custom Arduino libraries.
 
 ### Advanced Features  
 This is essentially stretch goals or developing new features. Our basic framework covers simple firmware features, but given the cool possibilities enabled by the Pico, this is where we puruse stretch goals with PIO, DMA, and Protobuf.
@@ -108,7 +109,7 @@ This is essentially stretch goals or developing new features. Our basic framewor
   [PIO SPI](https://github.com/raspberrypi/pico-examples/tree/master/pio/spi)
   
 - **DMA Controller - ADVANCED**  
-  If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints.
+  If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints. Even cooler though, if you get DMA working you can actually implement software interrupts :O
   There's an example using UART to do it, so we should proably start there and then port it over to SPI/I2C:  
   [PIO UART DMA](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_dma) 
   [PIO UART RX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_rx) 
