@@ -75,6 +75,17 @@ public:
         // Feed the PIO the new blinking value
         ledPIO.updateBlink(pwm_input);
         ledMux.updateLED(color);
+        ledMux.updateLED(config::Color::Blue);
+        delay(500);
+        ledMux.updateLED(config::Color::Green);
+        delay(500);
+        ledMux.updateLED(config::Color::Yellow);
+        delay(500);
+        ledMux.updateLED(config::Color::Red);
+        delay(500);
+        ledMux.updateLED(config::Color::Off);
+        delay(500);
+        ledMux.updateLED(config::Color::On);
         // color = static_cast<config::Color>((static_cast<int>(color) + 1) % (config::LED_BUS_SIZE + 1));
     
         delay(500);

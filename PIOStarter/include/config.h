@@ -54,7 +54,8 @@ namespace config {
             Yellow = 2, 
             Green = 3, 
             Blue = 4, 
-            Off = 0
+            Off = 0,
+            On = 5
         };   
         // This enum is for setting multiple LEDs (still in development)
         enum Colors : uint8_t {                         ///< Test Enum for use with updateLEDs()

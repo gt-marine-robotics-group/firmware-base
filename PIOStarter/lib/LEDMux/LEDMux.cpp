@@ -72,6 +72,9 @@ void LEDMux::updateLED(config::Color color) {
         case config::Color::Off: 
             pio_sm_put(pio, sm, 0b0000);
             break;
+        case config::Color::On: 
+            pio_sm_put(pio, sm, 0b1111);
+            break;
         default:
             pio_sm_put(pio, sm, 0b0000);
             break;

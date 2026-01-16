@@ -15,6 +15,7 @@
 #include <Arduino.h>
 #include "config.h"
 
+
 /**
  * @brief 
  * This class is the module that represents the E-stop subsystem.

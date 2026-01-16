@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Config {
+    bool estop = 1;     //
+    bool manual = 2;    // whether manual or automatic
+}
