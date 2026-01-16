@@ -164,7 +164,10 @@ This is essentially stretch goals or developing new features. Our basic framewor
    Added Doxygen Comments to literally every single file. Still might need some improved clarity, especially regarding logical implementation.
 
 10. **Improve Board Specific Functionality and Remove Build Flags in App Flow**  
-    Made board specific files instead of AppCore lol. That's what I outlined in my original Discord message, and eliminates the need for a bunch of build flags in the logical flow, which was the annoying part. This tackles the whole shove bunch of build flags in a big main file issue, but still requires build flags at the top because the compiler tries to compile all files in lib.  
+    Made board specific files instead of AppCore lol. That's what I outlined in my original Discord message, and eliminates the need for a bunch of build flags in the logical flow, which was the annoying part. This tackles the whole shove bunch of build flags in a big main file issue, but still requires build flags at the top because the compiler tries to compile all files in lib.
+
+11. **Initial Protobuf Support**  
+    Added a python script that generates Protobuf files from messages in the directory. Added documentation including changes to Readme on how to get started.
 
 ## Video demo
 <video src="https://github.gatech.edu/user-attachments/assets/e94030c5-7b0a-4ca9-8309-5265b8febaf2" controls>
