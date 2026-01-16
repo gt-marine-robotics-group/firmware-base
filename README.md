@@ -34,7 +34,7 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   - 2 Independent PWM outputs
   - E-Stop
   - Status Light (LED Interface)
-  - RC interface (not yet addressed)
+  - RC interface (for RoboBoat and not Sub)
 
 - **Sensor Board**
   Sensor Interface featuring
