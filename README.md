@@ -91,7 +91,7 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 - **Further compiler related considerations - ADVANCED**  
   Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
   Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
-  The key to all of this seems to be in how the LDF scans the libraries to find dependencies. On that note, althought ChatGPT says it's impossible, I really want to nest my folders in the lib folder but it doesn't work.
+  The key to all of this seems to be in how the LDF scans the libraries to find dependencies. On that note, althought ChatGPT says it's impossible, I really want to nest my folders in the lib folder but it doesn't work. 
   If we really want more control, we can switch to CMake, but that seems like way too much work.
   Maybe for beginners we can also convert this framework into custom Arduino libraries.
 
@@ -120,9 +120,9 @@ This is essentially stretch goals or developing new features. Our basic framewor
   There is a pretty reliable-looking example on the Pico Examples GitHub: 
   [PIO I2C](https://github.com/raspberrypi/pico-examples/tree/master/pio/i2c)
 
-- **I2C DMA through PIO - ADVANCED**  
-  This the previous two combined to make your life an absolute nightmare. Should be fun. :)
-  Endgoal is that the PIO formats the data into the right structure, which can basically be streamed through the RAM buffer where it gets serialized and then outputted to the USB. Absolute madness though.
+- **I2C DMA - ADVANCED**  
+  Modifying this to make this easier, you can actually hook up your I2C controller to the DMA channel. Should be fun. :)
+  Endgoal is that the DMA formats the data into the right structure, which can basically be streamed through the RAM buffer where it gets serialized and then outputted to the USB. Absolute madness though.
 
 - **Embedded Control/ML - ADVANCED**  
   Assuming we get through the PIO gauntlet above, we have now freed up a signficant amount of compute/processing power on our main CPU, as PIO is handling everything. This can be used for real-time embedded machine learning, control, and data processing (including error handling) applications. Will be a lot of fun if we can get that far.
@@ -168,6 +168,7 @@ This is essentially stretch goals or developing new features. Our basic framewor
 
 11. **Initial Protobuf Support**  
     Added a python script that generates Protobuf files from messages in the directory. Added documentation including changes to Readme on how to get started.
+    Also added script to automatically generate the PIO scripts. Might need to clean up the directory structure to match the Protobuf, so it's consistent.
 
 ## Video demo
 <video src="https://github.gatech.edu/user-attachments/assets/e94030c5-7b0a-4ca9-8309-5265b8febaf2" controls>
