@@ -12,7 +12,9 @@ Once again confirm with nanopb --version
 4. Compile your files using:  
 nanopb_generator -D [folder] [.proto file] <br><br>
 Alternatively I've added a script called generate_proto.py that automates this every time you build. To use it just add this line to your platform.ini:  
-extra_scripts = pre:generate_proto.py
+extra_scripts =   
+    pre:generate_proto.py  // This is for generating protobuf files  
+    pre:generate_pio.py    // This is for generating PIO wrapper files  
 
 
 ## Nice documentation on getting started with everything

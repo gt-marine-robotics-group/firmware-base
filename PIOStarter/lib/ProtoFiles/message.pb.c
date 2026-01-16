@@ -6,7 +6,10 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(Config, Config, AUTO)
+PB_BIND(operationStatus, operationStatus, AUTO)
+
+
+PB_BIND(positionCommand, positionCommand, AUTO)
 
 
 

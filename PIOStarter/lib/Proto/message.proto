@@ -1,6 +1,15 @@
 syntax = "proto3";
 
-message Config {
-    bool estop = 1;     //
+message operationStatus {
+    bool estop = 1;     // Whether EStop is engaged
     bool manual = 2;    // whether manual or automatic
+}
+
+message positionCommand {
+    sint32 roll = 3;        // Use signed int to get some directional control
+    sint32 pitch = 4;
+    sint32 yaw = 5;
+    sint32 surge = 6;      // Had to google these, but this is forward/backward
+    sint32 sway = 7;       // Laterally
+    sint32 heave = 8;      // Up and down
 }

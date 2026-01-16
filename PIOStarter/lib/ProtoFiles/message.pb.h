@@ -10,10 +10,19 @@
 #endif
 
 /* Struct definitions */
-typedef struct _Config {
-    bool estop; /*  */
+typedef struct _operationStatus {
+    bool estop; /* Whether EStop is engaged */
     bool manual; /* whether manual or automatic */
-} Config;
+} operationStatus;
+
+typedef struct _positionCommand {
+    int32_t roll; /* Use signed int to get some directional control */
+    int32_t pitch;
+    int32_t yaw;
+    int32_t surge; /* Had to google these, but this is forward/backward */
+    int32_t sway; /* Laterally */
+    int32_t heave; /* Up and down */
+} positionCommand;
 
 
 #ifdef __cplusplus
@@ -21,28 +30,49 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define Config_init_default                      {0, 0}
-#define Config_init_zero                         {0, 0}
+#define operationStatus_init_default             {0, 0}
+#define positionCommand_init_default             {0, 0, 0, 0, 0, 0}
+#define operationStatus_init_zero                {0, 0}
+#define positionCommand_init_zero                {0, 0, 0, 0, 0, 0}
 
 /* Field tags (for use in manual encoding/decoding) */
-#define Config_estop_tag                         1
-#define Config_manual_tag                        2
+#define operationStatus_estop_tag                1
+#define operationStatus_manual_tag               2
+#define positionCommand_roll_tag                 3
+#define positionCommand_pitch_tag                4
+#define positionCommand_yaw_tag                  5
+#define positionCommand_surge_tag                6
+#define positionCommand_sway_tag                 7
+#define positionCommand_heave_tag                8
 
 /* Struct field encoding specification for nanopb */
-#define Config_FIELDLIST(X, a) \
+#define operationStatus_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, BOOL,     estop,             1) \
 X(a, STATIC,   SINGULAR, BOOL,     manual,            2)
-#define Config_CALLBACK NULL
-#define Config_DEFAULT NULL
+#define operationStatus_CALLBACK NULL
+#define operationStatus_DEFAULT NULL
 
-extern const pb_msgdesc_t Config_msg;
+#define positionCommand_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, SINT32,   roll,              3) \
+X(a, STATIC,   SINGULAR, SINT32,   pitch,             4) \
+X(a, STATIC,   SINGULAR, SINT32,   yaw,               5) \
+X(a, STATIC,   SINGULAR, SINT32,   surge,             6) \
+X(a, STATIC,   SINGULAR, SINT32,   sway,              7) \
+X(a, STATIC,   SINGULAR, SINT32,   heave,             8)
+#define positionCommand_CALLBACK NULL
+#define positionCommand_DEFAULT NULL
+
+extern const pb_msgdesc_t operationStatus_msg;
+extern const pb_msgdesc_t positionCommand_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
-#define Config_fields &Config_msg
+#define operationStatus_fields &operationStatus_msg
+#define positionCommand_fields &positionCommand_msg
 
 /* Maximum encoded size of messages (where known) */
-#define Config_size                              4
-#define MESSAGE_PB_H_MAX_SIZE                    Config_size
+#define MESSAGE_PB_H_MAX_SIZE                    positionCommand_size
+#define operationStatus_size                     4
+#define positionCommand_size                     36
 
 #ifdef __cplusplus
 } /* extern "C" */
