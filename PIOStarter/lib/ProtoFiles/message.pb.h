@@ -24,6 +24,11 @@ typedef struct _positionCommand {
     int32_t heave; /* Up and down */
 } positionCommand;
 
+typedef struct _MyMessage {
+    int32_t id;
+    char content[64];
+} MyMessage;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,8 +37,10 @@ extern "C" {
 /* Initializer values for message structs */
 #define operationStatus_init_default             {0, 0}
 #define positionCommand_init_default             {0, 0, 0, 0, 0, 0}
+#define MyMessage_init_default                   {0, ""}
 #define operationStatus_init_zero                {0, 0}
 #define positionCommand_init_zero                {0, 0, 0, 0, 0, 0}
+#define MyMessage_init_zero                      {0, ""}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define operationStatus_estop_tag                1
@@ -44,6 +51,8 @@ extern "C" {
 #define positionCommand_surge_tag                6
 #define positionCommand_sway_tag                 7
 #define positionCommand_heave_tag                8
+#define MyMessage_id_tag                         9
+#define MyMessage_content_tag                    10
 
 /* Struct field encoding specification for nanopb */
 #define operationStatus_FIELDLIST(X, a) \
@@ -62,15 +71,24 @@ X(a, STATIC,   SINGULAR, SINT32,   heave,             8)
 #define positionCommand_CALLBACK NULL
 #define positionCommand_DEFAULT NULL
 
+#define MyMessage_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, INT32,    id,                9) \
+X(a, STATIC,   SINGULAR, STRING,   content,          10)
+#define MyMessage_CALLBACK NULL
+#define MyMessage_DEFAULT NULL
+
 extern const pb_msgdesc_t operationStatus_msg;
 extern const pb_msgdesc_t positionCommand_msg;
+extern const pb_msgdesc_t MyMessage_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define operationStatus_fields &operationStatus_msg
 #define positionCommand_fields &positionCommand_msg
+#define MyMessage_fields &MyMessage_msg
 
 /* Maximum encoded size of messages (where known) */
-#define MESSAGE_PB_H_MAX_SIZE                    positionCommand_size
+#define MESSAGE_PB_H_MAX_SIZE                    MyMessage_size
+#define MyMessage_size                           76
 #define operationStatus_size                     4
 #define positionCommand_size                     36
 

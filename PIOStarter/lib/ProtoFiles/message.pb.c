@@ -12,4 +12,7 @@ PB_BIND(operationStatus, operationStatus, AUTO)
 PB_BIND(positionCommand, positionCommand, AUTO)
 
 
+PB_BIND(MyMessage, MyMessage, AUTO)
+
+
 

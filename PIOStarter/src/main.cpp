@@ -27,6 +27,9 @@
 #elifdef BOARD_BETA
     #include "SensorBoard.h"
     SensorBoard myApp;
+#elifdef BOARD_GAMMA
+    #include "PrestoJrBoard.h"
+    PrestoJrBoard myApp;
 #endif
 
 // Don't do anything here, try and configure in AppCore for maximum flexibility and cleanliness

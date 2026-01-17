@@ -13,3 +13,8 @@ message positionCommand {
     sint32 sway = 7;       // Laterally
     sint32 heave = 8;      // Up and down
 }
+
+message MyMessage {
+    int32 id = 9;
+    string content = 10;
+}
