@@ -40,6 +40,7 @@ uint16_t ProtoSender::sendData(){
     // Encode the message
     if (!pb_encode(&stream, MyMessage_fields, &msg)) {
         // Handle error
+        // Serial.println("Failed to encode!!");
     }
     myPacketSerial.send(buffer, stream.bytes_written);
     return 0;

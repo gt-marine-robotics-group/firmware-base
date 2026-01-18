@@ -8,6 +8,7 @@ Import("env")
 LIB_DIR = os.path.join(env.subst("$PROJECT_DIR"), "lib")
 PROTO_DIR = os.path.join(LIB_DIR, "Proto")
 OUTPUT_DIR = os.path.join(LIB_DIR, "ProtoFiles") # Where the .pb.c/.pb.h will go
+PY_OUTPUT_DIR = os.path.join(LIB_DIR, "ProtoSim") # Where the .pb.c/.pb.h will go
 
 def generate_nanopb_files(source, target, env):
     # Create output directory if it doesn't exist
@@ -30,6 +31,15 @@ def generate_nanopb_files(source, target, env):
         
         if result.returncode != 0:
             print(f"Error: Nanopb failed on {proto_file}")
+
+        # 2. Generate Python Files for Testing/Host
+        print(f"Protoc: Generating Python bindings for {proto_file}...")
+        subprocess.run([
+            "protoc",
+            f"--proto_path={PROTO_DIR}",
+            f"--python_out={PY_OUTPUT_DIR}",
+            proto_path
+        ], shell=True)
 
 # This triggers the script every time you build
 env.AddPreAction("buildprog", generate_nanopb_files)

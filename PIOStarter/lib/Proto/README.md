@@ -2,7 +2,9 @@
 1. Get the [.zip File](https://github.com/protocolbuffers/protobuf/releases)  
 Extract it to a folder, and add the bin file to path (check to see if it has a .exe file within)  
 Restart your computer, then ensure that you did this correctly by running in Powershell:  
-protoc --version
+protoc --version  <br>  
+Also make sure to run this command since the zip files are a little outdated:  
+pip install --upgrade protobuf  
 
 2. Run pip install nanopb  
 Once again confirm with nanopb --version
