@@ -61,9 +61,21 @@ class ProtoSender{
          */
         uint16_t sendData();
 
+        /**
+         * @brief Read and print the current sensor data
+         * @return the current sensor data (currently just a placeholder)
+         * @todo Make a struct for the sensor data or just directly load the protobuf envelope
+         * @see included library for information on sensor operation and usage
+         */
+        void sendStatus(bool estop, bool manual);
+
     private:
         PacketSerial myPacketSerial;
+        
         MyMessage msg;
+        operationStatus status;
+        positionCommand command;
+
         uint8_t buffer[128];
         pb_ostream_t stream;
         

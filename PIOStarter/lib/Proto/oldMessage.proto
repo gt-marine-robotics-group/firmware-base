@@ -18,11 +18,3 @@ message MyMessage {
     int32 id = 9;
     string content = 10;
 }
-
-message Envelope {
-    oneof payload {
-        operationStatus status = 1;
-        positionCommand pos = 2;
-        MyMessage debug = 3;
-    }
-}

@@ -22,12 +22,37 @@ ProtoReceiver::ProtoReceiver() {
 
 }
 
+// Initialize the list globally
+int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
+
+// This function runs whenever a full COBS packet is received
+void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
+    Envelope env = Envelope_init_zero;
+    pb_istream_t stream = pb_istream_from_buffer(buffer, size);
+
+    if (pb_decode(&stream, Envelope_fields, &env)) {
+        // Check if the received envelope contains a position command
+        if (env.which_payload == Envelope_pos_tag) {
+            global_position[0] = env.payload.pos.roll;
+            global_position[1] = env.payload.pos.pitch;
+            global_position[2] = env.payload.pos.yaw;
+            global_position[3] = env.payload.pos.surge;
+            global_position[4] = env.payload.pos.sway;
+            global_position[5] = env.payload.pos.heave;
+            
+            Serial.println("Position updated!");
+        }
+    }
+}
+
 void ProtoReceiver::setup(){
-    
+    myPacketSerial.begin(115200);
+    // Link the callback function
+    myPacketSerial.setPacketHandler(&ProtoReceiver::onPacketReceived);
 }
 
 uint16_t ProtoReceiver::receiveData(){
-    
+    myPacketSerial.update();
     return 0;
 }
 

@@ -22,6 +22,8 @@
 #include "pb_encode.h"
 #include "pb_decode.h"
 
+#include "message.pb.h"
+
 /**
  * @brief 
  * Acts as a wrapper for the SparkFun sensor library.
@@ -59,7 +61,12 @@ class ProtoReceiver{
          */
         uint16_t receiveData();
 
+        static void onPacketReceived(const uint8_t* buffer, size_t size);
+        
+        static int32_t global_position[6];
     private:
+        PacketSerial myPacketSerial;
+        // int32_t global_position[6] = {0, 0, 0, 0, 0, 0};
         
 };
 

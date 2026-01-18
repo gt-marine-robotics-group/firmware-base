@@ -21,6 +21,8 @@
 
 #include "config.h"
 #include "ProtoSender.h"
+#include "ProtoReceiver.h"
+#include "LEDMux.h"
 
 /**
  * @brief 
@@ -40,6 +42,8 @@ public:
         // Serial.begin(115200);
         // Only initializes what exists for this specific board
         protoSender.setup();
+        protoReceiver.setup();
+        ledMux.setup();
     }
 
     /**
@@ -49,13 +53,46 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        protoSender.sendData();        
+        // protoSender.sendData();
+        protoSender.sendStatus(true, false);        
         delay(1000);
+        protoSender.sendStatus(false, true);
+        delay(1000);
+        
+        protoReceiver.receiveData();
+        if (ProtoReceiver::global_position[0]){
+            ledMux.updateLED(config::Color::Blue);
+        }
+        delay(500);
+        if (ProtoReceiver::global_position[1]){
+            ledMux.updateLED(config::Color::Green);
+        }
+        delay(500);
+        if (ProtoReceiver::global_position[2]){
+            ledMux.updateLED(config::Color::Yellow);
+        }
+        delay(500);
+        if (ProtoReceiver::global_position[3]){
+            ledMux.updateLED(config::Color::Red);
+        }
+        delay(500);
+        if (ProtoReceiver::global_position[4]){
+            ledMux.updateLED(config::Color::On);
+        }
+        delay(500);
+        if (ProtoReceiver::global_position[5]){
+            ledMux.updateLED(config::Color::Off);
+        }
+        delay(500);
     }
 
 private:
     // Unlike AppCore's approach, we assume these objects exist due the platform.ini definitions
     ProtoSender protoSender;
+    ProtoReceiver protoReceiver;
+
+    LEDMux ledMux;
+    config::Color color = config::Color::Off;
 };
 
 #endif
