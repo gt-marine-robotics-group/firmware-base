@@ -18,6 +18,8 @@ extra_scripts =
     pre:generate_proto.py  // This is for generating protobuf files  
     pre:generate_pio.py    // This is for generating PIO wrapper files  
 
+5. Test your files using the python files in ProtoSim folder.
+
 
 ## Nice documentation on getting started with everything
 [Nanopb GitHub](https://github.com/nanopb/nanopb?tab=readme-ov-file)  

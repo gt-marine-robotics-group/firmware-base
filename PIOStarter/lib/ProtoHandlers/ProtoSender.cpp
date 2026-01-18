@@ -1,15 +1,14 @@
 /**
- * @file DOFStick.cpp
+ * @file ProtoSender.cpp
  * @author Jason Hsiao
- * @date 12/24/2025
+ * @date 1/16/2025
  * @version 1.0
  *
- * @brief Implementation of 9 DOF Stick Sensor Interface.
+ * @brief Implementation of Protobuf sender.
  *
  * This file holds the functions for instantiating, setting up, 
- * and reading/printing the sensor data.
+ * and sending data over ProtoBuf.
  * 
- * @todo See if there is a way to directly interface with Protobuf or PIO DMA
  * @see config.h for the hardware definitions like GPIO mapping
  */
 

@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * @file protoReceiver.h
+ * @file ProtoReceiver.h
  * @author Jason Hsiao
  * @date 1/16/2026
  * @version 1.0
@@ -29,14 +29,14 @@
  * @note Only compiled if the HAS_PROT flag is defined in the build environment.
  * Also is tied to the same I2C bus as the DOFStick object.
  */
-class protoReceiver{
+class ProtoReceiver{
     public:
         /**
          * @brief Construct a new protoReceiver object.
          * @note Does not initialize hardware. Use setup() for GPIO/PIO setup 
          * to ensure the hardware is ready after the system clock stabilizes.
          */
-        protoReceiver();
+        ProtoReceiver();
 
         /**
          * @brief Set-up the new protoReceiver object.
