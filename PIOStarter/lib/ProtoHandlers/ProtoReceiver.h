@@ -64,6 +64,8 @@ class ProtoReceiver{
         static void onPacketReceived(const uint8_t* buffer, size_t size);
         
         static int32_t global_position[6];
+
+        static bool newMessage;
     private:
         PacketSerial myPacketSerial;
         // int32_t global_position[6] = {0, 0, 0, 0, 0, 0};

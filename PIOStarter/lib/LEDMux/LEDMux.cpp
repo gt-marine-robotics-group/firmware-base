@@ -87,6 +87,11 @@ void LEDMux::updateLEDs(uint8_t colors){
     pio_sm_put(pio, sm, (mask & colors));                       // apparently it is cast to a uint32_t anyhow
 }
 
+void LEDMux::updateLEDSequence(uint32_t sequence){
+    Serial.println(sequence);
+    pio_sm_put(pio, sm, sequence);
+};
+
 
 #endif
 

@@ -3,10 +3,10 @@
 /**
  * @file PrestoJrBoard.h
  * @author Jason Hsiao
- * @date 12/24/2025
+ * @date 1/17/2025
  * @version 1.0
  *
- * @brief Header (and implementation) for Presto board.
+ * @brief Header (and implementation) for Presto Jr board.
  *
  * This file controls the logical flow of the board and the 
  * instantiation and function calls of different modules.
@@ -44,6 +44,11 @@ public:
         protoSender.setup();
         protoReceiver.setup();
         ledMux.setup();
+
+        uint32_t seq = (0b1000 << 4) + (0b0100);
+        ledMux.updateLEDSequence(seq);
+        pinMode(16, INPUT_PULLDOWN);
+        
     }
 
     /**
@@ -53,37 +58,48 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        // protoSender.sendData();
-        protoSender.sendStatus(true, false);        
-        delay(1000);
-        protoSender.sendStatus(false, true);
-        delay(1000);
-        
+        // // protoSender.sendData();
+        // protoSender.sendStatus(true, false);        
+        // delay(1000);
+        // protoSender.sendStatus(false, true);
+        // delay(1000);
         protoReceiver.receiveData();
-        if (ProtoReceiver::global_position[0]){
-            ledMux.updateLED(config::Color::Blue);
+        if (ProtoReceiver::newMessage){
+            digitalWrite(16, HIGH);
+            // if (ProtoReceiver::global_position[0]){
+            //     ledMux.updateLEDs(config::Colors::Blue | config::Colors::Green);
+            // }
+            // delay(500);
+
+            // // if (ProtoReceiver::global_position[0]){
+            // //     ledMux.updateLED(config::Color::Blue);
+            // // }
+            // // delay(500);
+            uint32_t sequence = 0;
+            if (ProtoReceiver::global_position[0]){
+                sequence |= config::Colors::Blue << (4 * 0);
+            }
+            if (ProtoReceiver::global_position[1]){
+                sequence |= config::Colors::Green << (4 * 1);
+            }
+            if (ProtoReceiver::global_position[2]){
+                sequence |= config::Colors::Yellow << (4 * 2);
+            }
+            if (ProtoReceiver::global_position[3]){
+                sequence |= config::Colors::Red << (4 * 3);
+            }
+            if (ProtoReceiver::global_position[4]){
+                sequence |= config::Colors::Off << (4 * 4);
+            }
+            if (ProtoReceiver::global_position[5]){
+                sequence |= config::Colors::On << (4 * 5);
+            }
+            ProtoReceiver::newMessage = false;
+            ledMux.updateLEDSequence(sequence);
+            delay(500);
+            digitalWrite(16, LOW);
         }
-        delay(500);
-        if (ProtoReceiver::global_position[1]){
-            ledMux.updateLED(config::Color::Green);
-        }
-        delay(500);
-        if (ProtoReceiver::global_position[2]){
-            ledMux.updateLED(config::Color::Yellow);
-        }
-        delay(500);
-        if (ProtoReceiver::global_position[3]){
-            ledMux.updateLED(config::Color::Red);
-        }
-        delay(500);
-        if (ProtoReceiver::global_position[4]){
-            ledMux.updateLED(config::Color::On);
-        }
-        delay(500);
-        if (ProtoReceiver::global_position[5]){
-            ledMux.updateLED(config::Color::Off);
-        }
-        delay(500);
+        delay(100);
     }
 
 private:

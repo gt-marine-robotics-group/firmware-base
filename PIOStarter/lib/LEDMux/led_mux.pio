@@ -1,5 +1,0 @@
-.program led_mux
-.wrap_target
-    pull block    ; Pauses here until the CPU sends data
-    out pins, 4   ; Applies the 4 bits to the pins
-.wrap             ; Automatically jumps back to pull block

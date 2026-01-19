@@ -69,6 +69,8 @@ class LEDMux{
          * @todo Actually run this and make sure it works, updateLED() is confirmed to work though
          */
         void updateLEDs(uint8_t colors);
+
+        void updateLEDSequence(uint32_t sequence);
         
         private:
             PIO pio;                ///< PIO instance allocated by the driver

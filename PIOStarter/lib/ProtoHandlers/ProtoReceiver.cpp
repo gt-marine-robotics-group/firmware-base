@@ -24,6 +24,7 @@ ProtoReceiver::ProtoReceiver() {
 
 // Initialize the list globally
 int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
+bool ProtoReceiver::newMessage = false;
 
 // This function runs whenever a full COBS packet is received
 void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
@@ -40,6 +41,7 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             global_position[4] = env.payload.pos.sway;
             global_position[5] = env.payload.pos.heave;
             
+            newMessage = true;
             Serial.println("Position updated!");
         }
     }

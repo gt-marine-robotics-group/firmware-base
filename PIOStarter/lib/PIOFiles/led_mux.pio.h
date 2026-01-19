@@ -13,20 +13,27 @@
 // ------- //
 
 #define led_mux_wrap_target 0
-#define led_mux_wrap 1
+#define led_mux_wrap 8
 #define led_mux_pio_version 0
 
 static const uint16_t led_mux_program_instructions[] = {
             //     .wrap_target
-    0x80a0, //  0: pull   block
-    0x6004, //  1: out    pins, 4
+    0x8080, //  0: pull   noblock
+    0xa027, //  1: mov    x, osr
+    0xa047, //  2: mov    y, osr
+    0x0068, //  3: jmp    !y, 8
+    0x6004, //  4: out    pins, 4
+    0xe05f, //  5: set    y, 31
+    0x1f86, //  6: jmp    y--, 6                 [31]
+    0x0002, //  7: jmp    2
+    0xbf42, //  8: nop                           [31]
             //     .wrap
 };
 
 #if !PICO_NO_HARDWARE
 static const struct pio_program led_mux_program = {
     .instructions = led_mux_program_instructions,
-    .length = 2,
+    .length = 9,
     .origin = -1,
     .pio_version = led_mux_pio_version,
 #if PICO_PIO_VERSION > 0

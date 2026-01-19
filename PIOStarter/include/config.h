@@ -63,6 +63,7 @@ namespace config {
             Yellow = 1 << 1,                            ///< 0b0010
             Green = 1 << 2,                             ///< 0b0100
             Blue = 1 << 3,                              ///< 0b1000
+            On = (1 << 5) - 1,                          ///< 0b1111
             Off = 0                                     ///< 0b0000 (no flag set)
         };  
     #endif
