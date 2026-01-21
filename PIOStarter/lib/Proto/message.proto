@@ -6,17 +6,18 @@ message operationStatus {
 }
 
 message positionCommand {
-    sint32 roll = 3;        // Use signed int to get some directional control
-    sint32 pitch = 4;
-    sint32 yaw = 5;
-    sint32 surge = 6;      // Had to google these, but this is forward/backward
-    sint32 sway = 7;       // Laterally
-    sint32 heave = 8;      // Up and down
+    sint32 roll = 1;        // Use signed int to get some directional control
+    sint32 pitch = 2;
+    sint32 yaw = 3;
+    sint32 surge = 4;      // Had to google these, but this is forward/backward
+    sint32 sway = 5;       // Laterally
+    sint32 heave = 6;      // Up and down
 }
 
+
 message MyMessage {
-    int32 id = 9;
-    string content = 10;
+    int32 id = 1;
+    string content = 2;
 }
 
 message Envelope {
