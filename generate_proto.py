@@ -5,7 +5,7 @@ Import("env")
 # We use env.subst("$PROJECT_DIR") to get the absolute path to your project
 # Modify these paths to point exactly where your files are
 # LIB_DIR = os.path.join(env.subst("$PROJECT_DIR"), "lib", "Protobuf")
-LIB_DIR = os.path.join(env.subst("$PROJECT_DIR"), "lib")
+LIB_DIR = os.path.join(env.subst("$PROJECT_DIR"), "PIOStarter", "lib")
 PROTO_DIR = os.path.join(LIB_DIR, "Proto")
 OUTPUT_DIR = os.path.join(LIB_DIR, "ProtoFiles") # Where the .pb.c/.pb.h will go
 PY_OUTPUT_DIR = os.path.join(LIB_DIR, "ProtoSim") # Where the .pb.c/.pb.h will go
