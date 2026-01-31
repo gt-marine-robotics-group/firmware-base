@@ -24,6 +24,17 @@ typedef struct _positionCommand {
     int32_t heave; /* Up and down */
 } positionCommand;
 
+typedef struct _motorCommand {
+    int32_t motor1;
+    int32_t motor2;
+    int32_t motor3;
+    int32_t motor4;
+    int32_t motor5;
+    int32_t motor6;
+    int32_t motor7;
+    int32_t motor8;
+} motorCommand;
+
 typedef struct _MyMessage {
     int32_t id;
     char content[64];
@@ -35,6 +46,7 @@ typedef struct _Envelope {
         operationStatus status;
         positionCommand pos;
         MyMessage debug;
+        motorCommand motor_msg;
     } payload;
 } Envelope;
 
@@ -46,27 +58,38 @@ extern "C" {
 /* Initializer values for message structs */
 #define operationStatus_init_default             {0, 0}
 #define positionCommand_init_default             {0, 0, 0, 0, 0, 0}
+#define motorCommand_init_default                {0, 0, 0, 0, 0, 0, 0, 0}
 #define MyMessage_init_default                   {0, ""}
 #define Envelope_init_default                    {0, {operationStatus_init_default}}
 #define operationStatus_init_zero                {0, 0}
 #define positionCommand_init_zero                {0, 0, 0, 0, 0, 0}
+#define motorCommand_init_zero                   {0, 0, 0, 0, 0, 0, 0, 0}
 #define MyMessage_init_zero                      {0, ""}
 #define Envelope_init_zero                       {0, {operationStatus_init_zero}}
 
 /* Field tags (for use in manual encoding/decoding) */
 #define operationStatus_estop_tag                1
 #define operationStatus_manual_tag               2
-#define positionCommand_roll_tag                 3
-#define positionCommand_pitch_tag                4
-#define positionCommand_yaw_tag                  5
-#define positionCommand_surge_tag                6
-#define positionCommand_sway_tag                 7
-#define positionCommand_heave_tag                8
-#define MyMessage_id_tag                         9
-#define MyMessage_content_tag                    10
+#define positionCommand_roll_tag                 1
+#define positionCommand_pitch_tag                2
+#define positionCommand_yaw_tag                  3
+#define positionCommand_surge_tag                4
+#define positionCommand_sway_tag                 5
+#define positionCommand_heave_tag                6
+#define motorCommand_motor1_tag                  1
+#define motorCommand_motor2_tag                  2
+#define motorCommand_motor3_tag                  3
+#define motorCommand_motor4_tag                  4
+#define motorCommand_motor5_tag                  5
+#define motorCommand_motor6_tag                  6
+#define motorCommand_motor7_tag                  7
+#define motorCommand_motor8_tag                  8
+#define MyMessage_id_tag                         1
+#define MyMessage_content_tag                    2
 #define Envelope_status_tag                      1
 #define Envelope_pos_tag                         2
 #define Envelope_debug_tag                       3
+#define Envelope_motor_msg_tag                   4
 
 /* Struct field encoding specification for nanopb */
 #define operationStatus_FIELDLIST(X, a) \
@@ -76,46 +99,63 @@ X(a, STATIC,   SINGULAR, BOOL,     manual,            2)
 #define operationStatus_DEFAULT NULL
 
 #define positionCommand_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, SINT32,   roll,              3) \
-X(a, STATIC,   SINGULAR, SINT32,   pitch,             4) \
-X(a, STATIC,   SINGULAR, SINT32,   yaw,               5) \
-X(a, STATIC,   SINGULAR, SINT32,   surge,             6) \
-X(a, STATIC,   SINGULAR, SINT32,   sway,              7) \
-X(a, STATIC,   SINGULAR, SINT32,   heave,             8)
+X(a, STATIC,   SINGULAR, SINT32,   roll,              1) \
+X(a, STATIC,   SINGULAR, SINT32,   pitch,             2) \
+X(a, STATIC,   SINGULAR, SINT32,   yaw,               3) \
+X(a, STATIC,   SINGULAR, SINT32,   surge,             4) \
+X(a, STATIC,   SINGULAR, SINT32,   sway,              5) \
+X(a, STATIC,   SINGULAR, SINT32,   heave,             6)
 #define positionCommand_CALLBACK NULL
 #define positionCommand_DEFAULT NULL
 
+#define motorCommand_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, INT32,    motor1,            1) \
+X(a, STATIC,   SINGULAR, INT32,    motor2,            2) \
+X(a, STATIC,   SINGULAR, INT32,    motor3,            3) \
+X(a, STATIC,   SINGULAR, INT32,    motor4,            4) \
+X(a, STATIC,   SINGULAR, INT32,    motor5,            5) \
+X(a, STATIC,   SINGULAR, INT32,    motor6,            6) \
+X(a, STATIC,   SINGULAR, INT32,    motor7,            7) \
+X(a, STATIC,   SINGULAR, INT32,    motor8,            8)
+#define motorCommand_CALLBACK NULL
+#define motorCommand_DEFAULT NULL
+
 #define MyMessage_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, INT32,    id,                9) \
-X(a, STATIC,   SINGULAR, STRING,   content,          10)
+X(a, STATIC,   SINGULAR, INT32,    id,                1) \
+X(a, STATIC,   SINGULAR, STRING,   content,           2)
 #define MyMessage_CALLBACK NULL
 #define MyMessage_DEFAULT NULL
 
 #define Envelope_FIELDLIST(X, a) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,status,payload.status),   1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,pos,payload.pos),   2) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (payload,debug,payload.debug),   3)
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,debug,payload.debug),   3) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,motor_msg,payload.motor_msg),   4)
 #define Envelope_CALLBACK NULL
 #define Envelope_DEFAULT NULL
 #define Envelope_payload_status_MSGTYPE operationStatus
 #define Envelope_payload_pos_MSGTYPE positionCommand
 #define Envelope_payload_debug_MSGTYPE MyMessage
+#define Envelope_payload_motor_msg_MSGTYPE motorCommand
 
 extern const pb_msgdesc_t operationStatus_msg;
 extern const pb_msgdesc_t positionCommand_msg;
+extern const pb_msgdesc_t motorCommand_msg;
 extern const pb_msgdesc_t MyMessage_msg;
 extern const pb_msgdesc_t Envelope_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
 #define operationStatus_fields &operationStatus_msg
 #define positionCommand_fields &positionCommand_msg
+#define motorCommand_fields &motorCommand_msg
 #define MyMessage_fields &MyMessage_msg
 #define Envelope_fields &Envelope_msg
 
 /* Maximum encoded size of messages (where known) */
-#define Envelope_size                            78
+#define Envelope_size                            90
 #define MESSAGE_PB_H_MAX_SIZE                    Envelope_size
 #define MyMessage_size                           76
+#define motorCommand_size                        88
 #define operationStatus_size                     4
 #define positionCommand_size                     36
 

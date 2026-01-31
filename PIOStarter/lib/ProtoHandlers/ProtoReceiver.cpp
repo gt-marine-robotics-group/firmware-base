@@ -24,6 +24,8 @@ ProtoReceiver::ProtoReceiver() {
 
 // Initialize the list globally
 int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
+int32_t ProtoReceiver::motor_commands[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 bool ProtoReceiver::newMessage = false;
 
 // This function runs whenever a full COBS packet is received
@@ -43,6 +45,18 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             
             newMessage = true;
             Serial.println("Position updated!");
+        }
+        if (env.which_payload == Envelope_pos_tag) {
+            motor_commands[0] = env.payload.motor_msg.motor1;
+            motor_commands[1] = env.payload.motor_msg.motor2;
+            motor_commands[2] = env.payload.motor_msg.motor3;
+            motor_commands[3] = env.payload.motor_msg.motor4;
+            motor_commands[4] = env.payload.motor_msg.motor5;
+            motor_commands[5] = env.payload.motor_msg.motor6;
+            motor_commands[6] = env.payload.motor_msg.motor7;
+            motor_commands[7] = env.payload.motor_msg.motor8;
+            newMessage = true;
+            Serial.println("Motors updated!");
         }
     }
 }

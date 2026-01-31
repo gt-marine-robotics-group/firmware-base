@@ -14,6 +14,16 @@ message positionCommand {
     sint32 heave = 6;      // Up and down
 }
 
+message motorCommand {
+    int32 motor1 = 1;      
+    int32 motor2 = 2;
+    int32 motor3 = 3;
+    int32 motor4 = 4;      
+    int32 motor5 = 5;      
+    int32 motor6 = 6;
+    int32 motor7 = 7;
+    int32 motor8 = 8;      
+}
 
 message MyMessage {
     int32 id = 1;
@@ -25,5 +35,6 @@ message Envelope {
         operationStatus status = 1;
         positionCommand pos = 2;
         MyMessage debug = 3;
+        motorCommand motor_msg = 4;
     }
 }

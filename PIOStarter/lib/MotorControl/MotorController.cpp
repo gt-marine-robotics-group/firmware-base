@@ -27,9 +27,18 @@ MotorController::MotorController() {
 
 // TODO: instantiate variable amounts of PWM outputs (defined in config.h)
 void MotorController::setup(){
-    pinMode(config::PWM_OUT, OUTPUT);
-    pinMode(config::AI1, OUTPUT);
-    pinMode(config::AI2, OUTPUT);
+    // pinMode(config::PWM_OUT, OUTPUT);
+    // pinMode(config::AI1, OUTPUT);
+    // pinMode(config::AI2, OUTPUT);
+
+    motor1.attach(config::MOTOR_1);
+    motor2.attach(config::MOTOR_2);
+    motor3.attach(config::MOTOR_3);
+    motor4.attach(config::MOTOR_4);
+    motor5.attach(config::MOTOR_5);
+    motor6.attach(config::MOTOR_6);
+    motor7.attach(config::MOTOR_7);
+    motor8.attach(config::MOTOR_8);
 }
 
 bool MotorController::estop(){
@@ -77,6 +86,17 @@ void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, ui
     for (uint8_t i = 0; i < count; i++) {
         results[i] = spinMotor(pins[i], PWMs[i]);
     }
+}
+
+void MotorController::spinMotors(int32_t* motor_commands) {
+    motor1.writeMicroseconds(motor_commands[0]);
+    motor2.writeMicroseconds(motor_commands[1]);
+    motor3.writeMicroseconds(motor_commands[2]);
+    motor4.writeMicroseconds(motor_commands[3]);
+    motor5.writeMicroseconds(motor_commands[4]);
+    motor6.writeMicroseconds(motor_commands[5]);
+    motor7.writeMicroseconds(motor_commands[6]);
+    motor8.writeMicroseconds(motor_commands[7]);
 }
 
 #endif

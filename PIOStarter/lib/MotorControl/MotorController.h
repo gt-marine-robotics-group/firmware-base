@@ -16,6 +16,7 @@
 #ifdef HAS_MOTORS
 
 #include <Arduino.h>
+#include <Servo.h>
 #include "config.h"
 
 /**
@@ -65,6 +66,7 @@ class MotorController{
          * Also not really tested that effectively (I only have 2 motors and even less wires)
          */
         void spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, uint8_t count);
+        void spinMotors(int32_t* motor_commands);
         
     private:
         // Alternatively consider putting these in config.h for more centralization but I prefer modularity
@@ -72,6 +74,15 @@ class MotorController{
         static constexpr int ADC_CENTER = 512;      ///< The middle value of the ADC for flipping direction
         static constexpr int PWM_MAX    = 255;      ///< Max value of a PWM, low-key this should be a global constant but idk where to put this
         static constexpr int DEADBAND   = 50;       ///< Don't operate the motor at too low of a PWM, adjust to remove jitter
+
+        Servo motor1;
+        Servo motor2;
+        Servo motor3;
+        Servo motor4;
+        Servo motor5;
+        Servo motor6;
+        Servo motor7;
+        Servo motor8;
 };
 
 #endif

@@ -39,14 +39,15 @@ public:
      * @todo Maybe consider a name change then lol
      */
     void begin() {
-        // Serial.begin(115200);
+        Serial.begin(115200);
         // Only initializes what exists for this specific board
         protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
         protoReceiver.setup();      // Not that that is a bad thing
-        ledMux.setup();
+        motorController.setup();
+        // ledMux.setup();
 
-        uint32_t seq = (0b1000 << 4) + (0b0100);
-        ledMux.updateLEDSequence(seq);
+        // uint32_t seq = (0b1000 << 4) + (0b0100);
+        // ledMux.updateLEDSequence(seq);
         pinMode(16, INPUT_PULLDOWN);
         
     }
@@ -64,52 +65,61 @@ public:
         // protoSender.sendStatus(false, true);
         // delay(1000);
         protoReceiver.receiveData();
+        // if (ProtoReceiver::newMessage){
+        //     digitalWrite(16, HIGH);
+        //     // if (ProtoReceiver::global_position[0]){
+        //     //     ledMux.updateLEDs(config::Colors::Blue | config::Colors::Green);
+        //     // }
+        //     // delay(500);
+        //     // // if (ProtoReceiver::global_position[0]){
+        //     // //     ledMux.updateLED(config::Color::Blue);
+        //     // // }
+        //     // // delay(500);
+        //     uint32_t sequence = 0;
+        //     if (ProtoReceiver::global_position[0]){
+        //         sequence |= config::Colors::Blue << (4 * 0);
+        //     }
+        //     if (ProtoReceiver::global_position[1]){
+        //         sequence |= config::Colors::Green << (4 * 1);
+        //     }
+        //     if (ProtoReceiver::global_position[2]){
+        //         sequence |= config::Colors::Yellow << (4 * 2);
+        //     }
+        //     if (ProtoReceiver::global_position[3]){
+        //         sequence |= config::Colors::Red << (4 * 3);
+        //     }
+        //     if (ProtoReceiver::global_position[4]){
+        //         sequence |= config::Colors::Off << (4 * 4); // Setting only off doesn't work because it will assume null sequence, maybe have invisible 5th pin
+        //                                                     // Only works to stop the blinking for individual LEDs
+        //     }
+        //     if (ProtoReceiver::global_position[5]){
+        //         sequence |= config::Colors::On << (4 * 5);  // For some reason Red stays on a beat longer
+        //     }
+        //     ProtoReceiver::newMessage = false;
+        //     ledMux.updateLEDSequence(sequence);
+        //     delay(500);
+        //     digitalWrite(16, LOW);
+        // }
         if (ProtoReceiver::newMessage){
             digitalWrite(16, HIGH);
-            // if (ProtoReceiver::global_position[0]){
-            //     ledMux.updateLEDs(config::Colors::Blue | config::Colors::Green);
-            // }
-            // delay(500);
-
-            // // if (ProtoReceiver::global_position[0]){
-            // //     ledMux.updateLED(config::Color::Blue);
-            // // }
-            // // delay(500);
-            uint32_t sequence = 0;
-            if (ProtoReceiver::global_position[0]){
-                sequence |= config::Colors::Blue << (4 * 0);
-            }
-            if (ProtoReceiver::global_position[1]){
-                sequence |= config::Colors::Green << (4 * 1);
-            }
-            if (ProtoReceiver::global_position[2]){
-                sequence |= config::Colors::Yellow << (4 * 2);
-            }
-            if (ProtoReceiver::global_position[3]){
-                sequence |= config::Colors::Red << (4 * 3);
-            }
-            if (ProtoReceiver::global_position[4]){
-                sequence |= config::Colors::Off << (4 * 4); // Setting only off doesn't work because it will assume null sequence, maybe have invisible 5th pin
-                                                            // Only works to stop the blinking for individual LEDs
-            }
-            if (ProtoReceiver::global_position[5]){
-                sequence |= config::Colors::On << (4 * 5);  // For some reason Red stays on a beat longer
-            }
-            ProtoReceiver::newMessage = false;
-            ledMux.updateLEDSequence(sequence);
-            delay(500);
+            motorController.spinMotors(ProtoReceiver::motor_commands);
+            delay(1000);
+            
             digitalWrite(16, LOW);
         }
+        // int32_t motors[8] = {255, 255, 255, 255, 0, 0, 0, 0};
+        // motorController.spinMotors(motors);
         delay(100);
+
     }
 
 private:
     // Unlike AppCore's approach, we assume these objects exist due the platform.ini definitions
     ProtoSender protoSender;
     ProtoReceiver protoReceiver;
-
-    LEDMux ledMux;
-    config::Color color = config::Color::Off;
+    MotorController motorController;
+    // LEDMux ledMux;
+    // config::Color color = config::Color::Off;
 };
 
 #endif

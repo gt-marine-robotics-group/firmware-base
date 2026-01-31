@@ -4,7 +4,7 @@ import message_pb2
 import time
 
 # Update with your Pico's COM port
-ser = serial.Serial('COM7', 115200)
+ser = serial.Serial('COM12', 115200)
 
 def send_position(r, p, y, surge, sway, heave):
     # 1. Create the specific message
