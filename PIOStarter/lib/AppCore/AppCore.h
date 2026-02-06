@@ -13,6 +13,7 @@
  * @see config.h for the hardware definitions like GPIO mapping 
  * and platform.ini for build flag definitions.
  */
+#ifdef APP_CORE
 
 #include "config.h"
 #include "MotorController.h"
@@ -136,3 +137,5 @@ private:
         DOFStick imu;
     #endif
 };
+
+#endif

@@ -64,6 +64,7 @@ class ProtoReceiver{
         static void onPacketReceived(const uint8_t* buffer, size_t size);
         
         static int32_t global_position[6];
+        static int32_t motor_commands[8];
 
         static bool newMessage;
     private:

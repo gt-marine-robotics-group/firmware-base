@@ -30,6 +30,12 @@
 #elifdef BOARD_GAMMA
     #include "PrestoJrBoard.h"
     PrestoJrBoard myApp;
+#elifdef BOARD_DELTA
+    #include "ProtoBoard.h"
+    ProtoBoard myApp;
+#elifdef BOARD_EPSILON
+    #include "SubPrestoBoard.h"
+    SubPrestoBoard myApp;
 #endif
 
 // Don't do anything here, try and configure in AppCore for maximum flexibility and cleanliness

@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmessage.proto\"0\n\x0foperationStatus\x12\r\n\x05\x65stop\x18\x01 \x01(\x08\x12\x0e\n\x06manual\x18\x02 \x01(\x08\"g\n\x0fpositionCommand\x12\x0c\n\x04roll\x18\x03 \x01(\x11\x12\r\n\x05pitch\x18\x04 \x01(\x11\x12\x0b\n\x03yaw\x18\x05 \x01(\x11\x12\r\n\x05surge\x18\x06 \x01(\x11\x12\x0c\n\x04sway\x18\x07 \x01(\x11\x12\r\n\x05heave\x18\x08 \x01(\x11\"(\n\tMyMessage\x12\n\n\x02id\x18\t \x01(\x05\x12\x0f\n\x07\x63ontent\x18\n \x01(\t\"w\n\x08\x45nvelope\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x10.operationStatusH\x00\x12\x1f\n\x03pos\x18\x02 \x01(\x0b\x32\x10.positionCommandH\x00\x12\x1b\n\x05\x64\x65\x62ug\x18\x03 \x01(\x0b\x32\n.MyMessageH\x00\x42\t\n\x07payloadb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmessage.proto\"0\n\x0foperationStatus\x12\r\n\x05\x65stop\x18\x01 \x01(\x08\x12\x0e\n\x06manual\x18\x02 \x01(\x08\"g\n\x0fpositionCommand\x12\x0c\n\x04roll\x18\x01 \x01(\x11\x12\r\n\x05pitch\x18\x02 \x01(\x11\x12\x0b\n\x03yaw\x18\x03 \x01(\x11\x12\r\n\x05surge\x18\x04 \x01(\x11\x12\x0c\n\x04sway\x18\x05 \x01(\x11\x12\r\n\x05heave\x18\x06 \x01(\x11\"\x8e\x01\n\x0cmotorCommand\x12\x0e\n\x06motor1\x18\x01 \x01(\x05\x12\x0e\n\x06motor2\x18\x02 \x01(\x05\x12\x0e\n\x06motor3\x18\x03 \x01(\x05\x12\x0e\n\x06motor4\x18\x04 \x01(\x05\x12\x0e\n\x06motor5\x18\x05 \x01(\x05\x12\x0e\n\x06motor6\x18\x06 \x01(\x05\x12\x0e\n\x06motor7\x18\x07 \x01(\x05\x12\x0e\n\x06motor8\x18\x08 \x01(\x05\"(\n\tMyMessage\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"\x9b\x01\n\x08\x45nvelope\x12\"\n\x06status\x18\x01 \x01(\x0b\x32\x10.operationStatusH\x00\x12\x1f\n\x03pos\x18\x02 \x01(\x0b\x32\x10.positionCommandH\x00\x12\x1b\n\x05\x64\x65\x62ug\x18\x03 \x01(\x0b\x32\n.MyMessageH\x00\x12\"\n\tmotor_msg\x18\x04 \x01(\x0b\x32\r.motorCommandH\x00\x42\t\n\x07payloadb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,8 +35,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_OPERATIONSTATUS']._serialized_end=65
   _globals['_POSITIONCOMMAND']._serialized_start=67
   _globals['_POSITIONCOMMAND']._serialized_end=170
-  _globals['_MYMESSAGE']._serialized_start=172
-  _globals['_MYMESSAGE']._serialized_end=212
-  _globals['_ENVELOPE']._serialized_start=214
-  _globals['_ENVELOPE']._serialized_end=333
+  _globals['_MOTORCOMMAND']._serialized_start=173
+  _globals['_MOTORCOMMAND']._serialized_end=315
+  _globals['_MYMESSAGE']._serialized_start=317
+  _globals['_MYMESSAGE']._serialized_end=357
+  _globals['_ENVELOPE']._serialized_start=360
+  _globals['_ENVELOPE']._serialized_end=515
 # @@protoc_insertion_point(module_scope)
