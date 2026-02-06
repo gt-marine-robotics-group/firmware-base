@@ -46,7 +46,7 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             newMessage = true;
             // Serial.println("Position updated!");
         }
-        if (env.which_payload == Envelope_pos_tag) {
+        if (env.which_payload == Envelope_motor_msg_tag) {
             motor_commands[0] = env.payload.motor_msg.motor1;
             motor_commands[1] = env.payload.motor_msg.motor2;
             motor_commands[2] = env.payload.motor_msg.motor3;

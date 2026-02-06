@@ -26,10 +26,10 @@
 namespace config {
     // Pinout (Pin Definitions)
     #ifdef HAS_MOTORS
-        static constexpr uint8_t AI1 = 15;              ///< GPIO for Motor Direction Encoder 1
-        static constexpr uint8_t AI2 = 14;              ///< GPIO for Motor Direction Encoder 1
-        static constexpr uint8_t POT_IN = 26;           ///< GPIO for Potentiometer Analog Input
-        static constexpr uint8_t PWM_OUT = 18;          ///< GPIO for Motor PWM output
+        // static constexpr uint8_t AI1 = 15;              ///< GPIO for Motor Direction Encoder 1
+        // static constexpr uint8_t AI2 = 14;              ///< GPIO for Motor Direction Encoder 1
+        // static constexpr uint8_t POT_IN = 26;           ///< GPIO for Potentiometer Analog Input
+        // static constexpr uint8_t PWM_OUT = 18;          ///< GPIO for Motor PWM output
 
         static constexpr uint8_t MOTOR_1 = 1;
         static constexpr uint8_t MOTOR_2 = 2;

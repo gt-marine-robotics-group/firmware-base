@@ -42,7 +42,7 @@ def send_motors(pwm_list):
     print(f"Sent PWMs: {pwm_list}")
 
 if __name__ == "__main__":
-    print("Enter 8 PWM values (0-255) separated by spaces, or 'q' to quit.")
+    print("Enter 8 PWM values (1000-2000) separated by spaces, or 'q' to quit.")
     while True:
         try:
             inp = input(">> ")
@@ -52,8 +52,8 @@ if __name__ == "__main__":
             vals = [int(x) for x in inp.split()]
             
             # Basic validation
-            if any(v < 0 or v > 255 for v in vals):
-                print("Warning: PWM values should be between 0 and 255.")
+            if any(v < 1000 or v > 2000 for v in vals):
+                print("Warning: PWM values should be between 1000 and 2000.")
             
             send_motors(vals)
 

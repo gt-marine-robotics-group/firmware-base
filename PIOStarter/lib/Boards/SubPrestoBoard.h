@@ -17,13 +17,15 @@
  * and platform.ini for build flag definitions.
  */
 
-#ifdef BOARD_DELTA
+#ifdef BOARD_EPSILON
 
 #include "config.h"
 #include "ProtoSender.h"
 #include "ProtoReceiver.h"
 #include "LEDMux.h"
 #include "Estop.h"
+#include "MotorController.h"
+
 
 /**
  * @brief 
@@ -32,7 +34,7 @@
  * @note Is the equivalent of the main.cpp in most applications, but is abstracted for modularity 
  * and customizability.
  */
-class ProtoBoard {
+class SubPrestoBoard {
 public:
     /**
      * @brief Set-up all of our modules and the Serial monitor.
@@ -40,19 +42,22 @@ public:
      * @todo Maybe consider a name change then lol
      */
     void begin() {
-        Serial.begin(115200);
+        // Serial.begin(9600);
+        // Serial.println("Initialized :)");
 
         // Only initializes what exists for this specific board
         protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
-        protoReceiver.setup();      // Not that that is a bad thing
-        // motorController.setup();
+        protoReceiver.setup();      // Not that that is a bad thing, it's just packetSerial.begin() is a blocking call
+        
         estop.setup();
         ledMux.setup();
-
-        // uint32_t seq = (0b1000 << 4) + (0b0100);
+        
         uint32_t seq = (0b0100);
+        if (motorController.setup()){
+            seq = 0b0110;
+        }
         ledMux.updateLEDSequence(seq);
-        pinMode(16, INPUT_PULLDOWN);
+        // pinMode(16, INPUT_PULLDOWN);
         
     }
 
@@ -62,31 +67,32 @@ public:
      * @todo Okay might actually need to change these names
      */
     void update() {
-        // CPU doesn't need to worry about the PIO running in the background
-        // // protoSender.sendData();
         if (Estop::estopTriggered) {
+            motorController.estop();
             protoSender.sendStatus(true, false); 
             uint32_t estopped = (0b1000);
             ledMux.updateLEDSequence(estopped);
         } else {
-            protoSender.sendStatus(false, true);
-        }
-
-        protoReceiver.receiveData();
-        
-        if (ProtoReceiver::newMessage){
-            uint32_t message = (0b010);
-            ledMux.updateLEDSequence(message);
-            // motorController.spinMotors(ProtoReceiver::motor_commands);
-            delay(1000);
+            // protoSender.sendStatus(false, true);
             
-            uint32_t seq = (0b0100);
-            ledMux.updateLEDSequence(seq);
+            // motorController.sweepMotors(); // Initial Dry Test, comment this out during the actual motor run
 
-            ProtoReceiver::newMessage = false;
+            protoReceiver.receiveData();
+
+            if (ProtoReceiver::newMessage){
+                uint32_t message = (0b010);
+                ledMux.updateLEDSequence(message);
+                motorController.spinMotors(ProtoReceiver::motor_commands);
+                delay(1000);
+                
+                uint32_t seq = (0b0100);
+                ledMux.updateLEDSequence(seq);
+
+                ProtoReceiver::newMessage = false;
+            }
         }
         
-        delay(1000);
+        // delay(1000);
 
         }
 
@@ -95,10 +101,9 @@ private:
     // Unlike AppCore's approach, we assume these objects exist due the platform.ini definitions
     ProtoSender protoSender;
     ProtoReceiver protoReceiver;
-    // MotorController motorController;
+    MotorController motorController;
     Estop estop;
     LEDMux ledMux;
-    // config::Color color = config::Color::Off;
 };
 
 #endif

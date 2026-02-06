@@ -38,7 +38,7 @@ class MotorController{
          * @note Initializes hardware.
          * @see config.h for the GPIO mapping.
          */
-        void setup();
+        bool setup();
 
         /**
          * @brief Emergency stop for the MotorController object. 
@@ -67,6 +67,8 @@ class MotorController{
          */
         void spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, uint8_t count);
         void spinMotors(int32_t* motor_commands);
+
+        void sweepMotors();
         
     private:
         // Alternatively consider putting these in config.h for more centralization but I prefer modularity

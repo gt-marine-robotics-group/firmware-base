@@ -26,57 +26,56 @@ MotorController::MotorController() {
 }
 
 // TODO: instantiate variable amounts of PWM outputs (defined in config.h)
-void MotorController::setup(){
+bool MotorController::setup(){
     // pinMode(config::PWM_OUT, OUTPUT);
     // pinMode(config::AI1, OUTPUT);
     // pinMode(config::AI2, OUTPUT);
-
-    motor1.attach(config::MOTOR_1);
-    motor2.attach(config::MOTOR_2);
-    motor3.attach(config::MOTOR_3);
-    motor4.attach(config::MOTOR_4);
-    motor5.attach(config::MOTOR_5);
-    motor6.attach(config::MOTOR_6);
-    motor7.attach(config::MOTOR_7);
-    motor8.attach(config::MOTOR_8);
+    bool motorsAttached = true;
+    if (!motor1.attach(config::MOTOR_1)) motorsAttached = false;
+    if (!motor2.attach(config::MOTOR_2)) motorsAttached = false;
+    if (!motor3.attach(config::MOTOR_3)) motorsAttached = false;
+    if (!motor4.attach(config::MOTOR_4)) motorsAttached = false;
+    if (!motor5.attach(config::MOTOR_5)) motorsAttached = false;
+    if (!motor6.attach(config::MOTOR_6)) motorsAttached = false;
+    if (!motor7.attach(config::MOTOR_7)) motorsAttached = false;
+    if (!motor8.attach(config::MOTOR_8)) motorsAttached = false;
+    return motorsAttached;
 }
 
 bool MotorController::estop(){
-    digitalWrite(config::AI1, LOW);
-    digitalWrite(config::AI2, LOW);
-    analogWrite(config::PWM_OUT, 0);
+    // digitalWrite(config::AI1, LOW);
+    // digitalWrite(config::AI2, LOW);
+    // analogWrite(config::PWM_OUT, 0);
+    int32_t motorStop[8] = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
+    spinMotors(motorStop);
     return true;
 }
 
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
 // Make return a bool or void cuz this was originally supposed to be feedback but not really necessary
-uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
-    int32_t delta = static_cast<int32_t>(pot) - MotorController::ADC_CENTER;
-
-    // Deadband that way you aren't driving the motors super slow, which isn't great
-    if (abs(delta) < MotorController::DEADBAND) {
-        digitalWrite(config::AI1, LOW);
-        digitalWrite(config::AI2, LOW);
-        analogWrite(config::PWM_OUT, 0);
-        return 0;
-    } else {        
-        // Direction
-        bool forward = (delta > 0);
-
-        // Scale magnitude, converts difference from the pot center to a reasonable PWM value
-        uint8_t pwm = (static_cast<uint32_t>(abs(delta)) * MotorController::PWM_MAX) / MotorController::ADC_CENTER;
-
-        // Safety clamp
-        if (pwm > MotorController::PWM_MAX) pwm = MotorController::PWM_MAX;
-
-        // Drive H-bridge
-        digitalWrite(config::AI1, forward ? HIGH : LOW);
-        digitalWrite(config::AI2, forward ? LOW  : HIGH);
-        analogWrite(config::PWM_OUT, pwm);
-        return pwm;
-    }
-    return 0;
-}
+// uint16_t MotorController::spinMotor(uint8_t pin, int pot) {
+//     int32_t delta = static_cast<int32_t>(pot) - MotorController::ADC_CENTER;
+//     // Deadband that way you aren't driving the motors super slow, which isn't great
+//     if (abs(delta) < MotorController::DEADBAND) {
+//         digitalWrite(config::AI1, LOW);
+//         digitalWrite(config::AI2, LOW);
+//         analogWrite(config::PWM_OUT, 0);
+//         return 0;
+//     } else {        
+//         // Direction
+//         bool forward = (delta > 0);
+//         // Scale magnitude, converts difference from the pot center to a reasonable PWM value
+//         uint8_t pwm = (static_cast<uint32_t>(abs(delta)) * MotorController::PWM_MAX) / MotorController::ADC_CENTER;
+//         // Safety clamp
+//         if (pwm > MotorController::PWM_MAX) pwm = MotorController::PWM_MAX;
+//         // Drive H-bridge
+//         digitalWrite(config::AI1, forward ? HIGH : LOW);
+//         digitalWrite(config::AI2, forward ? LOW  : HIGH);
+//         analogWrite(config::PWM_OUT, pwm);
+//         return pwm;
+//     }
+//     return 0;
+// }
 
 // TODO: Changes to consider
 // Pull the PWMs from a defined list stored in private in this class
@@ -97,6 +96,34 @@ void MotorController::spinMotors(int32_t* motor_commands) {
     motor6.writeMicroseconds(motor_commands[5]);
     motor7.writeMicroseconds(motor_commands[6]);
     motor8.writeMicroseconds(motor_commands[7]);
+}
+
+// Just sweeping the motors for testing purpose, can make elegant code later
+void MotorController::sweepMotors() {
+    for (int i = 1000; i < 2000; i++){
+        motor1.writeMicroseconds(i);
+        motor2.writeMicroseconds(i);
+        motor3.writeMicroseconds(i);
+        motor4.writeMicroseconds(i);
+        motor5.writeMicroseconds(i);
+        motor6.writeMicroseconds(i);
+        motor7.writeMicroseconds(i);
+        motor8.writeMicroseconds(i);
+        delay(1);
+    }
+    
+    for (int i = 2000; i > 1000; i--){
+        // Serial.println(i);
+        motor1.writeMicroseconds(i);
+        motor2.writeMicroseconds(i);
+        motor3.writeMicroseconds(i);
+        motor4.writeMicroseconds(i);
+        motor5.writeMicroseconds(i);
+        motor6.writeMicroseconds(i);
+        motor7.writeMicroseconds(i);
+        motor8.writeMicroseconds(i);
+        delay(1);
+    }
 }
 
 #endif
