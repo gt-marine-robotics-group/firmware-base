@@ -88,6 +88,10 @@ void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, ui
 }
 
 void MotorController::spinMotors(int32_t* motor_commands) {
+    // // Safety check
+    // for (uint8_t i = 0; i < 8; i++){
+    //     if ((motor_commands[i] < 1000) || (motor_commands[i] > 2000)) return;
+    // }
     motor1.writeMicroseconds(motor_commands[0]);
     motor2.writeMicroseconds(motor_commands[1]);
     motor3.writeMicroseconds(motor_commands[2]);
