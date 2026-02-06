@@ -5,7 +5,7 @@ import sys
 
 # Setup Serial - adjust COM port as needed
 try:
-    ser = serial.Serial('COM7', 115200, timeout=1)
+    ser = serial.Serial('COM24', 115200, timeout=1)
 except Exception as e:
     print(f"Error: {e}")
     sys.exit(1)
