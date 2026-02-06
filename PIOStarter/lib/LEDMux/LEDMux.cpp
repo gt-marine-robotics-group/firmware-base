@@ -88,7 +88,7 @@ void LEDMux::updateLEDs(uint8_t colors){
 }
 
 void LEDMux::updateLEDSequence(uint32_t sequence){
-    Serial.println(sequence);
+    // Serial.println(sequence);
     pio_sm_put(pio, sm, sequence);
 };
 

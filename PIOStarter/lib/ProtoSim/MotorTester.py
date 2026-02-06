@@ -56,6 +56,8 @@ if __name__ == "__main__":
                 print("Warning: PWM values should be between 0 and 255.")
             
             send_motors(vals)
+
+            # Wait for return (add a protoReceiver here)
         except ValueError:
             print("Invalid input. Please enter numbers.")
         except Exception as e:

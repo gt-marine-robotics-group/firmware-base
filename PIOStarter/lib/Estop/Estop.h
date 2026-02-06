@@ -45,7 +45,7 @@ class Estop{
          * @note Interrupt is attached
          */
         static void handleEstop() {
-            Serial.println("E-stop was triggered");
+            // Serial.println("E-stop was triggered");
             estopTriggered = true;
             
             digitalWrite(config::ESTOP_LED, HIGH);
