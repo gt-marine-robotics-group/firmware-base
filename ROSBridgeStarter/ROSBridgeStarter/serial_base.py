@@ -19,15 +19,12 @@ class BaseBridge(ABC):
 
     def __init__(self,
                  port: Path = Path('/dev/ttyUSB0'),
-                 hz: int = 10,
                  baud: int = 115200,
                  rx_timeout_sec: float = 0.05,
                  tx_label = BOARD_JETSON_ID,
                  rx_label = BOARD_PRESTO_ID
 
     ) -> None:
-
-        self._period = 1.0 / hz
 
         self._device = serial.Serial(str(port), baud, timeout=rx_timeout_sec)
         self._device_info = {}
@@ -84,27 +81,28 @@ class BaseBridge(ABC):
             pass
     
 
-# Example Class for the Preso Board on Robosub:
-
+# ------- Concreate MCU Bridges ------
 
 from ROSBridgeStarter.pb.robosub_pb2 import (
     Header,
     MotorCommand,
     IndicatorLightCommand,
     PrestoState,
+    SensorBState,
     Envelope,
     BOARD_JETSON_ID,
-    BOARD_PRESTO_ID
+    BOARD_PRESTO_ID,
+    BOARD_SENSORB_ID
 )
 
 class PrestoBridge(BaseBridge):
     
     def __init__(self, 
                 port = Path('/dev/ttyUSB0'), 
-                hz = 10, 
                 baud = 115200, 
-                rx_timeout_sec = 0.05) -> None:
-        super().__init__(port, hz, baud, rx_timeout_sec)
+                rx_timeout_sec = 0.05
+    ) -> None:
+        super().__init__(port, baud, rx_timeout_sec)
 
     # --------- Board Specific Encoding / Decoding ------
     def send_motor_command(self, motors8: list[float]) -> None:
@@ -149,4 +147,26 @@ class PrestoBridge(BaseBridge):
 
         if env.WhichOneof("payload") == "presto_state":  # How we can detect what kind of data is coming in
             return env.presto_state
+        return None
+
+class SensorBoardBridge(BaseBridge):
+    
+    def __init__(self, 
+                port = Path('/dev/ttyUSB1'), 
+                baud = 115200, 
+                rx_timeout_sec = 0.05, 
+                tx_label=BOARD_JETSON_ID, 
+                rx_label=BOARD_SENSORB_ID
+    ) -> None:
+
+       super().__init__(port, baud, rx_timeout_sec, tx_label, rx_label) 
+
+    def read_state_once(self) -> SensorBState | None:
+        """Read one SensorBState from the wire, if present."""
+        env = self._read_envelope_once()
+        if not env:
+            return None
+
+        if env.WhichOneof("payload") == "sensorb_state":
+            return env.sensorb_state
         return None
