@@ -46,44 +46,56 @@ The current list of project goals. Feel free to add or handle these, but if you 
 This codebase is only a proof-of-concept, we need to actually do the annoying part now and use this framework to implement our specific features. A helpful resource is the skeleton code that Mitchell originally laid out when we were rushing to meet deadlines (linked below).
 #### Roadmap: <br> Decision-making and Familiarize with New Framework (1-2 weeks) <br> Breadboarding done by Early February (3 weeks) <br> Tested on actual boards by end of February (6 weeks) <br>
 
-- **SPI Sensor - BEGINNER**  
+- **SPI Sensor - BEGINNER - OPTIONAL**  
   The advanced goal is to make a fancier SPI communication interface using PIO. This one is just set up an SPI sensor and is pretty easy, but I don't actually have an SPI sensor with me during break. Should take like 10 minutes to set up since there are plenty of examples, and I also have reference code from ECE4180 if needed. If I'm being honest, I'm not sure if we have any SPI sensors, but it's good to keep in our back pocket.
-  
-- **Motor Controller - BEGINNER**  
-  I have this mostly laid out, is just some GPIO mapping and tuning the constants. Could become INTERMEDIATE if you want to do some fun stuff with structs and Protobuf.
   
 - **Make this work for our firmware - INTERMEDIATE**  
   This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
   See Notion page below for list of tasks.
 
+- **Sensing Board - INTERMEDIATE**  
+  Erin Beazley will be taking point on this, but follow the example under lib/BoardDemos to make this work for our specific sensors.
+
+- **Light Tower - INTERMEDIATE - OPTIONAL**  
+  I wrote a super cool Programmable IO script that handles all of our light tower needs, but I didn't realize that the light tower is active low. I designed it so that you could add variable-length sequences of blinking patterns, but this new meant that I had to ignore all 0 inputs. This means that we will need to modify our light tower logic to be inverted, either by flipping all bits when outputting or flipping the read-in logic to ignore all 1s (which might be harder).
+  Would like to note though, at the moment this should work for everything else besides turning on all the LEDs.
+
+- **Clean-up Protobuf-ROS Bridge - INTERMEDIATE**  
+  The bare minimum implementation is done but there are several things that might need to get fixed
+  1. the protobuf set-up is blocking, I've temporarily added a change that should fix it but haven't tested it yet.
+  2. we moved the protobuf definitions outside of the firmware folder so that mitchell could use it for ROS, but I haven't merged those changes yet.
+  3. Whoever merges the changes will probably also need to write the ROS pub/sub on the other side.
+
 - **Torpedo - INTERMEDIATE**  
   Not included in this firmware base but just for record-keeping
-
-- **Merge in ROS Handlers from old/skeleton code - INTERMEDIATE/ADVANCED**  
-  See previous bullet point, but also if I'm completely honest, I only somewhat understand the RC Framework. Like I can see what it's doing, but I don't want to dive into the weeds of it. Also clean up the syntax cuz it's a little messy.
-
+  
 
  ### Framework & Architecture Design
  This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
  #### Roadmap: <br> Higher-level decision-making and planning (assign tasks) (1-2 weeks) <br> INTERMEDIATE needs significant progress by start of March (2 months) <br> ADVANCED is for funsies and food for thought (don't care, but prob semester) <br>
  
-- **Better Comments/Documentation - BEGINNER**  
+- **Better Comments/Documentation - BEGINNER - OPTIONAL**  
   Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
 
 - **Draw the line between modularity and centralization - BEGINNER**  
   Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
-  Everyone seems to be pro board.h files so we'll use that until we get too many boards.
+  Edit from first week: Everyone seems to be pro board.h files so we'll use that until we get too many boards.
+
+- **Divide per Project - ADVANCED**  
+  Follow-up to above bulle point. This is going to take most of the semester, but as of 2/8 we have now reached the point where the firmware will need to be customized per project. The best way to do that is how I outlined it below under Further Compiler Related Considerations. Ideally we would use inheritance and implement virtual/abstract functions to gurantee a shared semblance of structure between similar classes (i.e. all sensors have a template of readData(), set-up(), and internal error-handling, so that other classes that rely on this data formatting can trust it, like a Protobuf sender that expects a specific formatting)
 
 - **RTOS - BEGINNER/INTERMEDIATE**  
+  Edit from 2/8: Priority for this has increased. Protobuf doesn't have interrupts, which means that we will start missing packets if any task takes too long. This means that it is officially time for RTOS.  
   Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
 
-- **Memory and Packet Design - INTERMEDIATE**  
+- **Memory and Packet Design - INTERMEDIATE - OPTIONAL**  
   Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication. Protobuf and COBS are already mad efficient so you'd have to be using structs and memory mapping to do this, might actually be ADVANCED.
 
 - **Debugging capabilities - INTERMEDIATE/ADVANCED**  
+  Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Will currently debug through the Protobuf receiver.
   Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
 
-- **Further compiler related considerations - ADVANCED**  
+- **Further compiler related considerations - ADVANCED - OPTIONAL**  
   Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
   Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
   I know that Null Object Patterning sounds jank but it would allow us to have interchangeable MotorControllers without build flags, if we have a basic Motor Controller class and each project makes a child Motor Controller.  
@@ -91,18 +103,10 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
   If we really want more control, we can switch to CMake, but that seems like way too much work.
   Maybe for beginners we can also convert this framework into custom Arduino libraries.
 
-### Advanced Features  
+
+### Advanced Features - OPTIONAL  
 This is essentially stretch goals or developing new features. Our basic framework covers simple firmware features, but given the cool possibilities enabled by the Pico, this is where we puruse stretch goals with PIO, DMA, and Protobuf.
 #### Roadmap: <br> R&D project so when possible (Semester) <br> <br> Ideal: <br> INTERMEDIATE done by Spring Break (2.5 months) <br> Significant progress on first 2 ADVANCED by end of semester (4 months) <br> Last 2 ADVANCED next semester - I'll have graduated by then rip
-
-- **NeoPixel PIO Controller - BEGINNER/INTERMEDIATE**  
-  Implementing NeoPixel control through PIO. Should be the easiest of all PIO projects, but requires some understanding of clocking and assembly. Also maybe design a good interface for using the NeoPixel (like encoding different modes or adding pass-through).
-  [NeoPixel information encoding]([https://github.com/raspberrypi/pico-examples/tree/master/pio/spi](https://forums.adafruit.com/viewtopic.php?t=195794))
-  [How to use Adafruit NeoPixel library](https://www.instructables.com/Neopixels-How-Do-They-Work/)
-  
-- **SPI Data collection through PIO - INTERMEDIATE**  
-  Implementing SPI Data collection through PIO. Should be the easiest between SPI/I2C/DMA, but not easy at all.
-  [PIO SPI](https://github.com/raspberrypi/pico-examples/tree/master/pio/spi)
   
 - **DMA Controller - ADVANCED**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints. Even cooler though, if you get DMA working you can actually implement software interrupts :O
@@ -110,22 +114,22 @@ This is essentially stretch goals or developing new features. Our basic framewor
   [PIO UART DMA](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_dma) 
   [PIO UART RX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_rx) 
   [PIO UART TX](https://github.com/raspberrypi/pico-examples/tree/master/pio/uart_tx)
-  
-- **I2C Data Collection through PIO - ADVANCED**  
-  Added regular I2C devices in main CPU context, but I believe the sensing board has 4 I2C connections (which could probably be just 2 or even 1), but 4 is too many for a Pico without PIO.
-  There is a pretty reliable-looking example on the Pico Examples GitHub: 
-  [PIO I2C](https://github.com/raspberrypi/pico-examples/tree/master/pio/i2c)
 
 - **I2C DMA - ADVANCED**  
   Modifying this to make this easier, you can actually hook up your I2C controller to the DMA channel. Should be fun. :)
   Endgoal is that the DMA formats the data into the right structure, which can basically be streamed through the RAM buffer where it gets serialized and then outputted to the USB. Absolute madness though.
+
+- **Bidirectional DShot over PIO - OPTIONAL BUT ALSO OBLIGATORY CUZ IT'S COOL**  
+  Main focus this semester, we'll be doing something like this guy's GitHub, but for our specific purposes
+  [Bidirectional DShot PIO reference](https://github.com/josephduchesne/pico-dshot-bidir)  
+  [Firmware to flash ESC](https://github.com/bird-sanctuary/bluejay)
 
 - **Embedded Control/ML - ADVANCED**  
   Assuming we get through the PIO gauntlet above, we have now freed up a signficant amount of compute/processing power on our main CPU, as PIO is handling everything. This can be used for real-time embedded machine learning, control, and data processing (including error handling) applications. Will be a lot of fun if we can get that far.
   JASON'S PET PROJECT: Pool resources to accomplish distributed compute :)
 
 
-## Project Iterations  
+## Project Log
 
 1. **Blink**  
    Simple LED blink functionality.
@@ -169,7 +173,33 @@ This is essentially stretch goals or developing new features. Our basic framewor
    - **Add the Protobuf and ROS Handlers - INTERMEDIATE/ADVANCED**  
      Make a designated package for Protobuf packing and interfacing with ROS.
 
-12. 
+12. **ROS Protobuf Bridge is done!!!**
+    Added a motor controller and then worked with Mitchell to be able to control the motors by publishing commands via ROS to the Protobuf handler where it's read and then spins the motors. This was successful, but there are still several changes that need to be made. However, this knocks out the following bullet points:   
+   - **Motor Controller - BEGINNER**  
+  I have this mostly laid out, is just some GPIO mapping and tuning the constants. Could become INTERMEDIATE if you want to do some fun stuff with structs and Protobuf.
+   - **Merge in ROS Handlers from old/skeleton code - INTERMEDIATE/ADVANCED**  
+  See previous bullet point, but also if I'm completely honest, I only somewhat understand the RC Framework. Like I can see what it's doing, but I don't want to dive into the weeds of it. Also clean up the syntax cuz it's a little messy.
+   - **Add the Protobuf and ROS Handlers - INTERMEDIATE/ADVANCED**  
+     Make a designated package for Protobuf packing and interfacing with ROS.
+
+13. **RoboBoat firmware and Modified EStop**  
+    Just the bare minimum implementation in advance of the 2/7 water test, but there are several changes that need to be made, see above under implementation
+
+## Graveyard  
+This section is for interesting ideas that realistically will not happen. If you're super cool and wanna be a necromancer or whatever, I would consider trying these out because these are very interesting project ideas that will strengthen your understanding of firmware and using the Pi Pico, and could also be a flex with resume or career fair discussion. Just this career fair, I spent 40 minutes talking about some of the fancy PIO stuff I'm trying, so this could help you too.
+- ~~**I2C Data Collection through PIO - ADVANCED**  
+  Added regular I2C devices in main CPU context, but I believe the sensing board has 4 I2C connections (which could probably be just 2 or even 1), but 4 is too many for a Pico without PIO.
+  There is a pretty reliable-looking example on the Pico Examples GitHub: 
+  [PIO I2C](https://github.com/raspberrypi/pico-examples/tree/master/pio/i2c)~~
+
+- ~~**NeoPixel PIO Controller - BEGINNER/INTERMEDIATE**  
+  Implementing NeoPixel control through PIO. Should be the easiest of all PIO projects, but requires some understanding of clocking and assembly. Also maybe design a good interface for using the NeoPixel (like encoding different modes or adding pass-through).
+  [NeoPixel information encoding]([https://github.com/raspberrypi/pico-examples/tree/master/pio/spi](https://forums.adafruit.com/viewtopic.php?t=195794))
+  [How to use Adafruit NeoPixel library](https://www.instructables.com/Neopixels-How-Do-They-Work/)~~
+  
+- ~~**SPI Data collection through PIO - INTERMEDIATE**  
+  Implementing SPI Data collection through PIO. Should be the easiest between SPI/I2C/DMA, but not easy at all.
+  [PIO SPI](https://github.com/raspberrypi/pico-examples/tree/master/pio/spi)~~
 
 ## Video demo
 <video src="https://github.gatech.edu/user-attachments/assets/e94030c5-7b0a-4ca9-8309-5265b8febaf2" controls>
