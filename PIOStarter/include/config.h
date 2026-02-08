@@ -43,8 +43,8 @@ namespace config {
     #endif
 
     #ifdef HAS_ESTOP
-        static constexpr uint8_t ESTOP_PIN = 13;        ///< GPIO for Triggering E-Stop Interrupt
-        static constexpr uint8_t ESTOP_LED = 12;        ///< GPIO for Indicating E-Stop Status
+        static constexpr uint8_t ESTOP_PIN = 18;        ///< GPIO for Triggering E-Stop Interrupt
+        static constexpr uint8_t ESTOP_LED = 27;        ///< GPIO for Indicating E-Stop Status
     #endif
 
     #ifdef HAS_INDICATOR_LED

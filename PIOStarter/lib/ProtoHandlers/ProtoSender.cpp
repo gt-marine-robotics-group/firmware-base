@@ -14,7 +14,7 @@
 
 #ifdef HAS_PROTO
 
-#include "protoSender.h"
+#include "ProtoSender.h"
 
 // Constructor
 ProtoSender::ProtoSender() {

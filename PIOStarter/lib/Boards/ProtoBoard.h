@@ -40,20 +40,23 @@ public:
      * @todo Maybe consider a name change then lol
      */
     void begin() {
-        Serial.begin(115200);
+        // Serial.begin(115200);
 
         // Only initializes what exists for this specific board
-        protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
-        protoReceiver.setup();      // Not that that is a bad thing
+        // protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
+        // protoReceiver.setup();      // Not that that is a bad thing
         // motorController.setup();
         estop.setup();
-        ledMux.setup();
+        // ledMux.setup();
 
         // uint32_t seq = (0b1000 << 4) + (0b0100);
-        uint32_t seq = (0b0100);
-        ledMux.updateLEDSequence(seq);
-        pinMode(16, INPUT_PULLDOWN);
-        
+        // uint32_t seq = (0b0000);
+        // ledMux.updateLEDSequence(seq);
+        pinMode(19, INPUT_PULLDOWN);
+        pinMode(20, INPUT_PULLDOWN);
+        pinMode(21, INPUT_PULLDOWN);
+        pinMode(22, INPUT_PULLDOWN);
+
     }
 
     /**
@@ -63,30 +66,36 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        // // protoSender.sendData();
-        if (Estop::estopTriggered) {
-            protoSender.sendStatus(true, false); 
-            uint32_t estopped = (0b1000);
-            ledMux.updateLEDSequence(estopped);
-        } else {
-            protoSender.sendStatus(false, true);
-        }
-
-        protoReceiver.receiveData();
+        // if (Estop::estopTriggered) {
+            // protoSender.sendStatus(true, false); 
+            // uint32_t estopped = (0b1000);
+            // ledMux.updateLEDSequence(estopped);
+        // } else {
+            // uint32_t estopped = (0b0100);
+            // ledMux.updateLEDSequence(estopped);
+            // protoSender.sendStatus(false, true);
+        // }
         
-        if (ProtoReceiver::newMessage){
-            uint32_t message = (0b010);
-            ledMux.updateLEDSequence(message);
-            // motorController.spinMotors(ProtoReceiver::motor_commands);
-            delay(1000);
+        protoSender.sendStatus(Estop::estopTriggered, false); 
+        digitalWrite(19, !Estop::estopTriggered);
+        digitalWrite(20, !Estop::estopTriggered);
+        digitalWrite(21, !Estop::estopTriggered);
+        digitalWrite(22, Estop::estopTriggered);
+        // protoReceiver.receiveData();
+        
+        // if (ProtoReceiver::newMessage){
+        //     uint32_t message = (0b010);
+        //     ledMux.updateLEDSequence(message);
+        //     // motorController.spinMotors(ProtoReceiver::motor_commands);
+        //     delay(1000);
             
-            uint32_t seq = (0b0100);
-            ledMux.updateLEDSequence(seq);
+        //     uint32_t seq = (0b0100);
+        //     ledMux.updateLEDSequence(seq);
 
-            ProtoReceiver::newMessage = false;
-        }
+        //     ProtoReceiver::newMessage = false;
+        // }
         
-        delay(1000);
+        delay(10);
 
         }
 
@@ -97,7 +106,7 @@ private:
     ProtoReceiver protoReceiver;
     // MotorController motorController;
     Estop estop;
-    LEDMux ledMux;
+    // LEDMux ledMux;
     // config::Color color = config::Color::Off;
 };
 
