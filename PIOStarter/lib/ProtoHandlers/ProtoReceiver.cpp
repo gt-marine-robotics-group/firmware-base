@@ -62,7 +62,10 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
 }
 
 void ProtoReceiver::setup(){
-    myPacketSerial.begin(115200);
+    // myPacketSerial.begin(115200);   // This has a blocking call in it
+    Serial.begin(115200);
+    myPacketSerial.setStream(&Serial);
+    
     // Link the callback function
     myPacketSerial.setPacketHandler(&ProtoReceiver::onPacketReceived);
 }
