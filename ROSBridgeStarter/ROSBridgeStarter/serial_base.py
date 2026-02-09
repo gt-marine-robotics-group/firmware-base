@@ -8,6 +8,18 @@ from google.protobuf.message import DecodeError as ProtobufDecodeError
 
 from abc import ABC
 
+# from ROSBridgeStarter.pb.robosub_pb2 import (
+#     # Header,
+#     # MotorCommand,
+#     IndicatorLightCommand,
+#     PrestoState,
+#     SensorBState,
+#     # Envelope,
+# )
+
+from ROSBridgeStarter.pb.message_pb2 import Envelope, motorCommand
+
+
 class BaseBridge(ABC):
     """
     Abstract class for bridge between ROS and a microcontroller
@@ -18,11 +30,11 @@ class BaseBridge(ABC):
     """
 
     def __init__(self,
-                 port: Path = Path('/dev/ttyUSB0'),
+                 port: Path = Path('/dev/ttyACM0'),
                  baud: int = 115200,
                  rx_timeout_sec: float = 0.05,
-                 tx_label = BOARD_JETSON_ID,
-                 rx_label = BOARD_PRESTO_ID
+                #  tx_label = BOARD_JETSON_ID,
+                #  rx_label = BOARD_PRESTO_ID
 
     ) -> None:
 
@@ -51,54 +63,43 @@ class BaseBridge(ABC):
         encoded = cobs.encode(data)
         self._device.write(encoded + b'\x00')
 
-    # Every project should have an Envelope class but it will differ slighly per project
-    def _send_envelope(self, envelope: Envelope) -> None:
-        """Serialize and send an Envelope message"""    
-        self._send(envelope.SerializeToString())
+    # # Every project should have an Envelope class but it will differ slighly per project
+    # def _send_envelope(self, envelope: Envelope) -> None:
+    #     """Serialize and send an Envelope message"""    
+    #     self._send(envelope.SerializeToString())
 
-    def _read_envelope_once(self) -> Envelope | None:
-        """Try to read one Envelope from the wire; return msg or None"""
+    # def _read_envelope_once(self) -> Envelope | None:
+    #     """Try to read one Envelope from the wire; return msg or None"""
 
-        data = self._read()
-        if not data:
-            return None
+    #     data = self._read()
+    #     if not data:
+    #         return None
         
-        env = Envelope()
-        try:
-            env.ParseFromString(data)
-        except ProtobufDecodeError:
-            return None
+    #     env = Envelope()
+    #     try:
+    #         env.ParseFromString(data)
+    #     except ProtobufDecodeError:
+    #         return None
 
-        if env.Header.id == self.rx_label:
-            return env
+    #     if env.Header.id == self.rx_label:
+    #         return env
 
-        return None
+    #     return None
     
-    def close(self) -> None:
-        try:
-            self._device.close()
-        except Exception:
-            pass
+    # def close(self) -> None:
+    #     try:
+    #         self._device.close()
+    #     except Exception:
+    #         pass
     
 
 # ------- Concreate MCU Bridges ------
 
-from ROSBridgeStarter.pb.robosub_pb2 import (
-    Header,
-    MotorCommand,
-    IndicatorLightCommand,
-    PrestoState,
-    SensorBState,
-    Envelope,
-    BOARD_JETSON_ID,
-    BOARD_PRESTO_ID,
-    BOARD_SENSORB_ID
-)
 
 class PrestoBridge(BaseBridge):
     
     def __init__(self, 
-                port = Path('/dev/ttyUSB0'), 
+                port = Path('/dev/ttyACM0'), 
                 baud = 115200, 
                 rx_timeout_sec = 0.05
     ) -> None:
@@ -109,64 +110,84 @@ class PrestoBridge(BaseBridge):
         if len(motors8) != 8:
             raise ValueError("MotorCommand requires exactly 8 values")
         
+        # env = Envelope()
+        # env.header.src = BOARD_JETSON_ID
+
+        # msg: MotorCommand = env.motor_cmd
+        # (
+        #     msg.motor_1, 
+        #     msg.motor_2, 
+        #     msg.motor_3, 
+        #     msg.motor_4,
+        #     msg.motor_5, 
+        #     msg.motor_6, 
+        #     msg.motor_7, 
+        #     msg.motor_8
+        # ) = motors8
+
+        # self._send_envelope(env)
+
+        for i in range(len(motors8)):
+            motors8[i] = int(motors8[i] * 500 + 1500)
+
         env = Envelope()
-        env.header.src = BOARD_JETSON_ID
 
-        msg: MotorCommand = env.motor_cmd
-        (
-            msg.motor_1, 
-            msg.motor_2, 
-            msg.motor_3, 
-            msg.motor_4,
-            msg.motor_5, 
-            msg.motor_6, 
-            msg.motor_7, 
-            msg.motor_8
-        ) = motors8
+        msg = motorCommand()
+        msg.motor1 = motors8[0]
+        msg.motor2 = motors8[1]
+        msg.motor3 = motors8[2]
+        msg.motor4 = motors8[3]
+        msg.motor5 = motors8[4]
+        msg.motor6 = motors8[5]
+        msg.motor7 = motors8[6]
+        msg.motor8 = motors8[7]
 
-        self._send_envelope(env)
+        env.motor_msg.CopyFrom(msg)
+        serialized = env.SerializeToString()
 
-    def send_indicator_led_command(self, r: float, g: float, b: float) -> None:
+        self._send(serialized)
 
-        env = Envelope()
-        env.header.src = BOARD_JETSON_ID
+    # def send_indicator_led_command(self, r: float, g: float, b: float) -> None:
 
-        msg: IndicatorLightCommand = env.indicator_cmd
-        msg.r = r
-        msg.g = g
-        msg.b = b
+    #     env = Envelope()
+    #     # env.header.src = BOARD_JETSON_ID
 
-        self._send_envelope(env)
+    #     msg: IndicatorLightCommand = env.indicator_cmd
+    #     msg.r = r
+    #     msg.g = g
+    #     msg.b = b
 
-    def read_state_once(self) -> PrestoState | None:
-        """Try to read one PrestoState from the wire; return msg or None."""
+    #     self._send_envelope(env)
 
-        env = self._read_envelope_once()
-        if not env:
-            return None
+    # def read_state_once(self) -> PrestoState | None:
+    #     """Try to read one PrestoState from the wire; return msg or None."""
 
-        if env.WhichOneof("payload") == "presto_state":  # How we can detect what kind of data is coming in
-            return env.presto_state
-        return None
+    #     env = self._read_envelope_once()
+    #     if not env:
+    #         return None
 
-class SensorBoardBridge(BaseBridge):
+    #     if env.WhichOneof("payload") == "presto_state":  # How we can detect what kind of data is coming in
+    #         return env.presto_state
+    #     return None
+
+# class SensorBoardBridge(BaseBridge):
     
-    def __init__(self, 
-                port = Path('/dev/ttyUSB1'), 
-                baud = 115200, 
-                rx_timeout_sec = 0.05, 
-                tx_label=BOARD_JETSON_ID, 
-                rx_label=BOARD_SENSORB_ID
-    ) -> None:
+#     def __init__(self, 
+#                 port = Path('/dev/ttyUSB1'), 
+#                 baud = 115200, 
+#                 rx_timeout_sec = 0.05, 
+#                 # tx_label=BOARD_JETSON_ID, 
+#                 # rx_label=BOARD_SENSORB_ID
+#     ) -> None:
 
-       super().__init__(port, baud, rx_timeout_sec, tx_label, rx_label) 
+#        super().__init__(port, baud, rx_timeout_sec)#, tx_label, rx_label) 
 
-    def read_state_once(self) -> SensorBState | None:
-        """Read one SensorBState from the wire, if present."""
-        env = self._read_envelope_once()
-        if not env:
-            return None
+#     def read_state_once(self) -> SensorBState | None:
+#         """Read one SensorBState from the wire, if present."""
+#         env = self._read_envelope_once()
+#         if not env:
+#             return None
 
-        if env.WhichOneof("payload") == "sensorb_state":
-            return env.sensorb_state
-        return None
+#         if env.WhichOneof("payload") == "sensorb_state":
+#             return env.sensorb_state
+#         return None

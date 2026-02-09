@@ -24,6 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'ros_firmware_bridge = ROSBridgeStarter.ros_bridge:main',
+            'ros_bridge_motor_test = ROSBridgeStarter.motor_test_bridge:main'
         ],
     },
 )
