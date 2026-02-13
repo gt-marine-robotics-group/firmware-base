@@ -83,7 +83,7 @@ public:
                 uint32_t message = (0b010);
                 ledMux.updateLEDSequence(message);
                 motorController.spinMotors(ProtoReceiver::motor_commands);
-                delay(1000);
+                // delay(1000);
                 
                 uint32_t seq = (0b0100);
                 ledMux.updateLEDSequence(seq);
