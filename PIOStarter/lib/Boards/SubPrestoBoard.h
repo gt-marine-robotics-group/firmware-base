@@ -58,6 +58,7 @@ public:
         }
         ledMux.updateLEDSequence(seq);
         // pinMode(16, INPUT_PULLDOWN);
+        last_message = millis();
         
     }
 
@@ -80,6 +81,8 @@ public:
             protoReceiver.receiveData();
 
             if (ProtoReceiver::newMessage){
+                last_message = millis();
+
                 uint32_t message = (0b010);
                 ledMux.updateLEDSequence(message);
                 motorController.spinMotors(ProtoReceiver::motor_commands);
@@ -89,6 +92,10 @@ public:
                 ledMux.updateLEDSequence(seq);
 
                 ProtoReceiver::newMessage = false;
+            }
+
+            if ((millis() - last_message) > 200){
+                motorController.estop();
             }
         }
         
@@ -104,6 +111,8 @@ private:
     MotorController motorController;
     Estop estop;
     LEDMux ledMux;
+
+    unsigned long last_message;
 };
 
 #endif
