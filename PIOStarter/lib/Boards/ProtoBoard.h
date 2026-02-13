@@ -43,8 +43,8 @@ public:
         // Serial.begin(115200);
 
         // Only initializes what exists for this specific board
-        // protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
-        // protoReceiver.setup();      // Not that that is a bad thing
+        protoSender.setup();        // Check if these are blocking because the code doesn't start until it connects
+        protoReceiver.setup();      // Not that that is a bad thing
         // motorController.setup();
         estop.setup();
         // ledMux.setup();
@@ -66,15 +66,15 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        // if (Estop::estopTriggered) {
-            // protoSender.sendStatus(true, false); 
+        if (Estop::estopTriggered) {
+            protoSender.sendStatus(true, false); 
             // uint32_t estopped = (0b1000);
             // ledMux.updateLEDSequence(estopped);
-        // } else {
+        } else {
             // uint32_t estopped = (0b0100);
             // ledMux.updateLEDSequence(estopped);
-            // protoSender.sendStatus(false, true);
-        // }
+            protoSender.sendStatus(false, true);
+        }
         
         protoSender.sendStatus(Estop::estopTriggered, false); 
         digitalWrite(19, !Estop::estopTriggered);
