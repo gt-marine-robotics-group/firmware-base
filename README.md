@@ -69,6 +69,9 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 - **Torpedo - INTERMEDIATE**  
   Not included in this firmware base but just for record-keeping
   
+- **Switch to Hardware PWM Controller for Motor operation due to Servo.h not being good**
+  Current Servo.h library uses PIO State machines to work. There are only 8, which are too few for our purposes and also justa waste of PIO. Switch to hardware-based PWM library like this one:
+  [Hardware Based Arduino Servo Library](https://github.com/107-systems/107-Arduino-Servo-RP2040)
 
  ### Framework & Architecture Design
  This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
@@ -107,6 +110,9 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 ### Advanced Features - OPTIONAL  
 This is essentially stretch goals or developing new features. Our basic framework covers simple firmware features, but given the cool possibilities enabled by the Pico, this is where we puruse stretch goals with PIO, DMA, and Protobuf.
 #### Roadmap: <br> R&D project so when possible (Semester) <br> <br> Ideal: <br> INTERMEDIATE done by Spring Break (2.5 months) <br> Significant progress on first 2 ADVANCED by end of semester (4 months) <br> Last 2 ADVANCED next semester - I'll have graduated by then rip
+
+- **PIO Servo Controller - ADVANCED (ALMOST CRACKHEAD)**
+  They had the right idea with the PIO State machines for Servo operation, but we condense the operation of all 8 servos into 2 state machines that control 4 motors each (with the same 8 bit resolution). Operation will be similar to the Programmable IO LED Mux with constant bit shifting and output. 
   
 - **DMA Controller - ADVANCED**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints. Even cooler though, if you get DMA working you can actually implement software interrupts :O
