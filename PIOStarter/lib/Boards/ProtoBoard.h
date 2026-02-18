@@ -66,15 +66,15 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        if (Estop::estopTriggered) {
-            protoSender.sendStatus(true, false); 
-            // uint32_t estopped = (0b1000);
-            // ledMux.updateLEDSequence(estopped);
-        } else {
-            // uint32_t estopped = (0b0100);
-            // ledMux.updateLEDSequence(estopped);
-            protoSender.sendStatus(false, true);
-        }
+        // if (Estop::estopTriggered) {
+        //     protoSender.sendStatus(true, false); 
+        //     // uint32_t estopped = (0b1000);
+        //     // ledMux.updateLEDSequence(estopped);
+        // } else {
+        //     // uint32_t estopped = (0b0100);
+        //     // ledMux.updateLEDSequence(estopped);
+        //     protoSender.sendStatus(false, true);
+        // }
         
         protoSender.sendStatus(Estop::estopTriggered, false); 
         digitalWrite(19, Estop::estopTriggered);
