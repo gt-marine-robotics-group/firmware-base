@@ -48,7 +48,7 @@ class Estop{
             Serial.println("E-stop was triggered");
             // estopTriggered = !estopTriggered;
             estopTriggered = !digitalRead(config::ESTOP_PIN);    // Change this to NOT, but need to invert all the logic
-            digitalWrite(config::ESTOP_LED, estopTriggered);
+            // digitalWrite(config::ESTOP_LED, estopTriggered);
         }
 
         /**
@@ -57,14 +57,14 @@ class Estop{
          */
         void setup(){
             // Ensure the pin is configured correctly before attaching the interrupt
-            pinMode(config::ESTOP_PIN, INPUT_PULLDOWN); 
+            pinMode(config::ESTOP_PIN, INPUT_PULLUP); 
             
             // Attach the interrupt to the pin
             // Syntax: attachInterrupt(digitalPinToInterrupt(pin), ISR, mode)
             attachInterrupt(digitalPinToInterrupt(config::ESTOP_PIN), handleEstop, CHANGE);
             
-            pinMode(config::ESTOP_LED, OUTPUT); 
-            digitalWrite(config::ESTOP_LED, LOW);
+            // pinMode(config::ESTOP_LED, OUTPUT); 
+            // digitalWrite(config::ESTOP_LED, LOW);
 
         }
 

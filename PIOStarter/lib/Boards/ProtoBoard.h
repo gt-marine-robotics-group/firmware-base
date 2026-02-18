@@ -77,10 +77,10 @@ public:
         }
         
         protoSender.sendStatus(Estop::estopTriggered, false); 
-        digitalWrite(19, !Estop::estopTriggered);
-        digitalWrite(20, !Estop::estopTriggered);
-        digitalWrite(21, !Estop::estopTriggered);
-        digitalWrite(22, Estop::estopTriggered);
+        digitalWrite(19, Estop::estopTriggered);
+        digitalWrite(20, Estop::estopTriggered);
+        digitalWrite(21, Estop::estopTriggered);
+        digitalWrite(22, !Estop::estopTriggered);
         // protoReceiver.receiveData();
         
         // if (ProtoReceiver::newMessage){
