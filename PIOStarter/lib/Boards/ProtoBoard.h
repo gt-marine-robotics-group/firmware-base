@@ -79,21 +79,23 @@ public:
         protoSender.sendStatus(Estop::estopTriggered, false); 
         digitalWrite(19, Estop::estopTriggered);
         digitalWrite(20, Estop::estopTriggered);
-        digitalWrite(21, Estop::estopTriggered);
+        digitalWrite(21, (Estop::estopTriggered) ? HIGH : !ProtoReceiver::manual_mode);    // Whenever e-stop is triggered, write high to turn it off, and when it's false, write !manual to turn it on
         digitalWrite(22, !Estop::estopTriggered);
-        // protoReceiver.receiveData();
+        protoReceiver.receiveData();
         
-        // if (ProtoReceiver::newMessage){
-        //     uint32_t message = (0b010);
-        //     ledMux.updateLEDSequence(message);
-        //     // motorController.spinMotors(ProtoReceiver::motor_commands);
-        //     delay(1000);
-            
-        //     uint32_t seq = (0b0100);
-        //     ledMux.updateLEDSequence(seq);
+        if (ProtoReceiver::newMessage){
+            // Put whatever new message handling you want here, this is just blinking the LED for a second, but this is blocking so don't do this
 
-        //     ProtoReceiver::newMessage = false;
-        // }
+            // uint32_t message = (0b010);
+            // ledMux.updateLEDSequence(message);
+            // // motorController.spinMotors(ProtoReceiver::motor_commands);
+            // // delay(1000);
+                
+            // uint32_t seq = (0b0100);
+            // ledMux.updateLEDSequence(seq);
+
+            ProtoReceiver::newMessage = false;
+        }
         
         delay(10);
 
