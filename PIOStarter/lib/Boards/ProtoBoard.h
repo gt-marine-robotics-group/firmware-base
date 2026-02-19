@@ -52,10 +52,10 @@ public:
         // uint32_t seq = (0b1000 << 4) + (0b0100);
         // uint32_t seq = (0b0000);
         // ledMux.updateLEDSequence(seq);
-        pinMode(19, INPUT_PULLDOWN);
-        pinMode(20, INPUT_PULLDOWN);
-        pinMode(21, INPUT_PULLDOWN);
-        pinMode(22, INPUT_PULLDOWN);
+        pinMode(19, OUTPUT);
+        pinMode(20, OUTPUT);
+        pinMode(21, OUTPUT);
+        pinMode(22, OUTPUT);
 
     }
 
