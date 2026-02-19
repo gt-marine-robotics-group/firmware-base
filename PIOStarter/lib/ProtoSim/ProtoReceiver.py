@@ -5,7 +5,7 @@ import sys
 
 # Setup Serial - Replace 'COM4' with your actual port
 try:
-    ser = serial.Serial('COM25', 115200, timeout=1)
+    ser = serial.Serial('COM26', 115200, timeout=1)
 except Exception as e:
     print(f"Error opening port: {e}")
     sys.exit(1)
