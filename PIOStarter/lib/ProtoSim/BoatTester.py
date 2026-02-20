@@ -6,14 +6,51 @@ import time
 import sys
 
 # --- Configuration ---
-SERIAL_PORT = 'COM26'  # Update to your Pico's port
+# SERIAL_PORT = 'COM26'  # Update to your Pico's port
 BAUD_RATE = 115200
 
-try:
-    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.1)
-except Exception as e:
-    print(f"Error: Could not open {SERIAL_PORT}. {e}")
+# ... (imports) ...
+import serial.tools.list_ports
+
+def find_pico_port():
+    """Search for a Raspberry Pi Pico by Hardware ID or Name."""
+    ports = serial.tools.list_ports.comports()
+    
+    for port in ports:
+        # Check by Name
+        if "Pico" in port.description or "RP2" in port.description:
+            return port.device
+        
+        # Check by Hardware ID (VID:PID for Pi Pico is usually 2E8A:0005)
+        if port.vid == 0x2E8A:
+            return port.device
+            
+    return None
+# 1. Detect the port
+detected_port = find_pico_port()
+
+if detected_port:
+    print(f"Detected Pico on {detected_port}")
+    try:
+        ser = serial.Serial(detected_port, 115200, timeout=0.1)
+    except Exception as e:
+        print(f"Could not open {detected_port}: {e}")
+        sys.exit(1)
+else:
+    print("Error: Raspberry Pi Pico not found! Is it plugged in?")
+    # Optional: List available ports to help debugging
+    print("Available ports:")
+    for p in serial.tools.list_ports.comports():
+        print(f" - {p.device}: {p.description}")
     sys.exit(1)
+
+# ... (rest of your threading and logic) ...
+
+# try:
+#     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.1)
+# except Exception as e:
+#     print(f"Error: Could not open {SERIAL_PORT}. {e}")
+#     sys.exit(1)
 
 def listener():
     """Thread function optimized for high-speed serial processing."""
