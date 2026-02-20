@@ -47,7 +47,7 @@ class Estop{
         static void handleEstop() {
             Serial.println("E-stop was triggered");
             // estopTriggered = !estopTriggered;
-            estopTriggered = !digitalRead(config::ESTOP_PIN);    // Change this to NOT, but need to invert all the logic
+            estopTriggered = digitalRead(config::ESTOP_PIN);    // Change this to NOT, but need to invert all the logic
             // digitalWrite(config::ESTOP_LED, estopTriggered);
         }
 
