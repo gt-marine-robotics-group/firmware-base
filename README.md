@@ -40,17 +40,17 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   - NeoPixel RGB LED
 
 Current assignments for Active MRG Firmware/Embedded Projects:
-Sensing Board Firmware: Shin + Erin (on break)
-Motor Controller Rewrite: Mahika
-Advanced Controller (Servo PIO State machine): Mahika, Liam + Jason
-Bidirectional D-Shot (even more advanced replacement): George
-Torpedo Embedded: Liam + Jason
-Torpedo Embedded CV: Peyton
-Architecture + Inheritance (Sensors): Ariana + Jason
-Current Sensing Board Stuff (waiting for electrical): Jason
-NeoPixel for RoboSub: Thalia
-Anything ROS-related: just ask Mitchell lol
-SPI/RTOS: Someone on RoboBoat
+- Sensing Board Firmware: Shin + Erin (on break)
+- Motor Controller Rewrite: Mahika
+- Advanced Controller (Servo PIO State machine): Mahika, Liam + Jason
+- Bidirectional D-Shot (even more advanced replacement): George
+- Torpedo Embedded: Liam + Jason
+- Torpedo Embedded CV: Peyton
+- Architecture + Inheritance (Sensors): Ariana + Jason
+- Current Sensing Board Stuff (waiting for electrical): Jason
+- NeoPixel for RoboSub: Thalia
+- Anything ROS-related: just ask Mitchell lol
+- SPI/RTOS: Someone on RoboBoat
 
 ## In-progress/Future Ideas to Implement
 The current list of project goals. Feel free to add or handle these, but if you take something off the list, please add it to the Project Iterations section below, so we can easily keep track for documentation and progress purposes. These are grouped into three categories and ordered by difficulty: Advanced Features, Implementation, and Framework & Architecture Design.
