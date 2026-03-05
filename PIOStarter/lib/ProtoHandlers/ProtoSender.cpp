@@ -14,7 +14,7 @@
 
 #ifdef HAS_PROTO
 
-#include "protoSender.h"
+#include "ProtoSender.h"
 
 // Constructor
 ProtoSender::ProtoSender() {
@@ -23,7 +23,9 @@ ProtoSender::ProtoSender() {
 }
 
 void ProtoSender::setup(){
-    myPacketSerial.begin(115200);
+    // myPacketSerial.begin(115200);    // This has a blocking call in it
+    Serial.begin(115200);
+    myPacketSerial.setStream(&Serial);
 
     msg = MyMessage_init_zero;
     status = operationStatus_init_zero;

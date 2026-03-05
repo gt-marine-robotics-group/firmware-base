@@ -65,6 +65,7 @@ class ProtoReceiver{
         
         static int32_t global_position[6];
         static int32_t motor_commands[8];
+        static bool manual_mode;
 
         static bool newMessage;
     private:

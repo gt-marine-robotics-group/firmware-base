@@ -25,6 +25,7 @@ ProtoReceiver::ProtoReceiver() {
 // Initialize the list globally
 int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
 int32_t ProtoReceiver::motor_commands[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+bool ProtoReceiver::manual_mode = false;
 
 bool ProtoReceiver::newMessage = false;
 
@@ -58,11 +59,19 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             newMessage = true;
             // Serial.println("Motors updated!");
         }
+        if (env.which_payload == Envelope_status_tag) {
+            manual_mode = env.payload.status.manual;
+            newMessage = true;
+            // Serial.println("Motors updated!");
+        }
     }
 }
 
 void ProtoReceiver::setup(){
-    myPacketSerial.begin(115200);
+    // myPacketSerial.begin(115200);   // This has a blocking call in it
+    Serial.begin(115200);
+    myPacketSerial.setStream(&Serial);
+    
     // Link the callback function
     myPacketSerial.setPacketHandler(&ProtoReceiver::onPacketReceived);
 }
