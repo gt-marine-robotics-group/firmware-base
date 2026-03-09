@@ -34,16 +34,20 @@ sine_mode = False
 sine_offset = 0.0
 
 last_send_time = 0
-MIN_SEND_INTERVAL = 0.02  # 50Hz cap
+MIN_SEND_INTERVAL = 0.02  # 50Hz cap (safety for manual bursts)
+HEARTBEAT_INTERVAL = 0.1   # 100ms (Keeps firmware watchdog happy)
+
 pico_status = {"estop": False, "manual": False, "debug": "No messages yet"}
 
 # --- 3. Communication Logic ---
 def send_motors(values):
+    """Encodes and sends the current motor state to the Pico."""
     global last_send_time, active_motors
     current_time = time.time()
-    if (current_time - last_send_time) < MIN_SEND_INTERVAL:
-        return 
-
+    
+    # We allow the send if it's a manual burst (after 20ms) OR 
+    # if it's a heartbeat (after 100ms)
+    
     motor_msg = message_pb2.motorCommand()
     (motor_msg.motor1, motor_msg.motor2, motor_msg.motor3, motor_msg.motor4,
      motor_msg.motor5, motor_msg.motor6, motor_msg.motor7, motor_msg.motor8) = values
@@ -57,6 +61,18 @@ def send_motors(values):
         last_send_time = current_time
     except Exception:
         pass
+
+def heartbeat_loop():
+    """Independent thread to ensure a command is sent at least every 100ms."""
+    while True:
+        current_time = time.time()
+        # If no command has been sent in the last 100ms, send the current active state
+        if (current_time - last_send_time) >= HEARTBEAT_INTERVAL:
+            # In staged mode, we send the last 'active' (committed) values.
+            # In live/sine mode, we send the current 'motors' values.
+            target = motors if (live_mode or sine_mode) else active_motors
+            send_motors(target)
+        time.sleep(0.01)
 
 def listener():
     buffer = bytearray()
@@ -83,8 +99,11 @@ def listener():
         except Exception: break
 
 # --- 4. Main UI & Control ---
-t = threading.Thread(target=listener, daemon=True)
-t.start()
+t_listen = threading.Thread(target=listener, daemon=True)
+t_listen.start()
+
+t_heart = threading.Thread(target=heartbeat_loop, daemon=True)
+t_heart.start()
 
 with term.fullscreen(), term.cbreak(), term.hidden_cursor():
     print(term.clear)
@@ -92,7 +111,7 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
         # Draw Header
         with term.location(0, 0):
             print(term.blue_bold + "--- Marine Robotics: Static Firmware Tester ---" + term.normal)
-            print(f"Port: {detected_port} | {term.bold}R{term.normal}: Ramp | {term.bold}L{term.normal}: Live | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero | {term.bold}ENTER{term.normal}: Send")
+            print(f"Port: {detected_port} | {term.bold}R{term.normal}: Ramp | {term.bold}L{term.normal}: Live | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero")
             print("-" * term.width)
 
         # Draw Motors
@@ -107,7 +126,6 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
                 label = f"Motor {i+1}"
                 motor_label = term.cyan + label + term.normal if group_mode else label
                 
-                # Yellow text if the value on screen differs from what is active on the Pico
                 val_color = term.bold
                 if motors[i] != active_motors[i]:
                     val_color = term.yellow_bold
@@ -134,7 +152,6 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             motors = [1500] * 8
             send_motors(motors)
         elif key.lower() == 'z':
-            # Zero (Reset) either the whole group or just the selected motor
             if group_mode:
                 motors = [1500] * 8
             else:
