@@ -50,14 +50,15 @@ public:
         protoReceiver.setup();      // Not that that is a bad thing, it's just packetSerial.begin() is a blocking call
         
         estop.setup();
-        ledMux.setup();
+        // ledMux.setup();
         
         uint32_t seq = (0b0100);
         if (motorController.setup()){
-            seq = 0b0110;
+            // seq = 0b0110;
         }
-        ledMux.updateLEDSequence(seq);
+        // ledMux.updateLEDSequence(seq);
         // pinMode(16, INPUT_PULLDOWN);
+        last_message = millis();
         
     }
 
@@ -70,8 +71,8 @@ public:
         if (Estop::estopTriggered) {
             motorController.estop();
             protoSender.sendStatus(true, false); 
-            uint32_t estopped = (0b1000);
-            ledMux.updateLEDSequence(estopped);
+            // uint32_t estopped = (0b1000);
+            // ledMux.updateLEDSequence(estopped);
         } else {
             // protoSender.sendStatus(false, true);
             
@@ -80,15 +81,21 @@ public:
             protoReceiver.receiveData();
 
             if (ProtoReceiver::newMessage){
-                uint32_t message = (0b010);
-                ledMux.updateLEDSequence(message);
+                last_message = millis();
+
+                // uint32_t message = (0b010);
+                // ledMux.updateLEDSequence(message);
                 motorController.spinMotors(ProtoReceiver::motor_commands);
-                delay(1000);
+                // delay(1000);
                 
-                uint32_t seq = (0b0100);
-                ledMux.updateLEDSequence(seq);
+                // uint32_t seq = (0b0100);
+                // ledMux.updateLEDSequence(seq);
 
                 ProtoReceiver::newMessage = false;
+            }
+
+            if ((millis() - last_message) > 200){
+                motorController.estop();
             }
         }
         
@@ -103,7 +110,9 @@ private:
     ProtoReceiver protoReceiver;
     MotorController motorController;
     Estop estop;
-    LEDMux ledMux;
+    // LEDMux ledMux;
+
+    unsigned long last_message;
 };
 
 #endif
