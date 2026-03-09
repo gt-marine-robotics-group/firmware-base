@@ -14,15 +14,26 @@ message positionCommand {
     sint32 heave = 6;      // Up and down
 }
 
+// message oldMotorCommand {
+//     int32 motor1 = 1;      
+//     int32 motor2 = 2;
+//     int32 motor3 = 3;
+//     int32 motor4 = 4;      
+//     int32 motor5 = 5;      
+//     int32 motor6 = 6;
+//     int32 motor7 = 7;
+//     int32 motor8 = 8;      
+// }
+
 message motorCommand {
-    int32 motor1 = 1;      
-    int32 motor2 = 2;
-    int32 motor3 = 3;
-    int32 motor4 = 4;      
-    int32 motor5 = 5;      
-    int32 motor6 = 6;
-    int32 motor7 = 7;
-    int32 motor8 = 8;      
+    float motor1 = 1;      
+    float motor2 = 2;
+    float motor3 = 3;
+    float motor4 = 4;      
+    float motor5 = 5;      
+    float motor6 = 6;
+    float motor7 = 7;
+    float motor8 = 8;      
 }
 
 message MyMessage {

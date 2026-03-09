@@ -66,7 +66,7 @@ class MotorController{
          * Also not really tested that effectively (I only have 2 motors and even less wires)
          */
         void spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, uint8_t count);
-        void spinMotors(int32_t* motor_commands);
+        void spinMotors(uint32_t* motor_commands);
 
         void sweepMotors();
         

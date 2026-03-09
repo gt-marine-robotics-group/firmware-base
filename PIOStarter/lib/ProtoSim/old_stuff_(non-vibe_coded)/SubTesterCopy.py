@@ -25,32 +25,25 @@ ser = serial.Serial(detected_port, 115200, timeout=0.01)
 term = Terminal()
 
 # --- 2. Global State ---
-motors = [0.0] * 8  
-active_motors = [0.0] * 8  
+motors = [1500] * 8  
+active_motors = [1500] * 8  
 selected_idx = 0
 group_mode = False
 live_mode = False
 sine_mode = False
 sine_offset = 0.0
 
-# Stepping Logic
-step_mode = "FINE"  # Can be "FINE" or "COARSE"
-current_step = 0.05
-
 last_send_time = 0
-MIN_SEND_INTERVAL = 0.02  
-HEARTBEAT_INTERVAL = 0.1   
-
+MIN_SEND_INTERVAL = 0.02  # 50Hz cap
 pico_status = {"estop": False, "manual": False, "debug": "No messages yet"}
-
-def clamp_and_round(val):
-    return round(max(-1.0, min(1.0, val)), 2)
 
 # --- 3. Communication Logic ---
 def send_motors(values):
     global last_send_time, active_motors
     current_time = time.time()
-    
+    if (current_time - last_send_time) < MIN_SEND_INTERVAL:
+        return 
+
     motor_msg = message_pb2.motorCommand()
     (motor_msg.motor1, motor_msg.motor2, motor_msg.motor3, motor_msg.motor4,
      motor_msg.motor5, motor_msg.motor6, motor_msg.motor7, motor_msg.motor8) = values
@@ -60,18 +53,10 @@ def send_motors(values):
     
     try:
         ser.write(cobs.encode(envelope.SerializeToString()) + b'\x00')
-        active_motors = [round(v, 2) for v in values]
+        active_motors = list(values)
         last_send_time = current_time
     except Exception:
         pass
-
-def heartbeat_loop():
-    while True:
-        current_time = time.time()
-        if (current_time - last_send_time) >= HEARTBEAT_INTERVAL:
-            target = motors if (live_mode or sine_mode) else active_motors
-            send_motors(target)
-        time.sleep(0.01)
 
 def listener():
     buffer = bytearray()
@@ -98,106 +83,110 @@ def listener():
         except Exception: break
 
 # --- 4. Main UI & Control ---
-t_listen = threading.Thread(target=listener, daemon=True)
-t_listen.start()
-
-t_heart = threading.Thread(target=heartbeat_loop, daemon=True)
-t_heart.start()
+t = threading.Thread(target=listener, daemon=True)
+t.start()
 
 with term.fullscreen(), term.cbreak(), term.hidden_cursor():
     print(term.clear)
     while True:
+        # Draw Header
         with term.location(0, 0):
-            print(term.blue_bold + "--- Marine Robotics: Precise Float Tester ---" + term.normal)
-            print(f"Port: {detected_port} | {term.bold}F{term.normal}: Toggle Step | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero | {term.bold}L{term.normal}: Live")
+            print(term.blue_bold + "--- Marine Robotics: Static Firmware Tester ---" + term.normal)
+            print(f"Port: {detected_port} | {term.bold}R{term.normal}: Ramp | {term.bold}L{term.normal}: Live | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero | {term.bold}ENTER{term.normal}: Send")
             print("-" * term.width)
 
+        # Draw Motors
         for i in range(8):
             with term.location(2, 4 + i):
                 prefix = term.black_on_white + "> " + term.normal if i == selected_idx else "  "
-                bar_width = 20
-                center = bar_width // 2
-                pos = int(motors[i] * center) + center
-                pos = max(0, min(bar_width, pos))
                 
-                bar = list("░" * bar_width)
-                bar[center] = "│"
-                if pos > center:
-                    for j in range(center + 1, pos + 1): bar[j-1] = "█"
-                elif pos < center:
-                    for j in range(pos, center): bar[j] = "█"
+                bar_len = int((motors[i] - 1000) / 1000 * 20)
+                bar_len = max(0, min(20, bar_len))
+                bar = "█" * bar_len + "░" * (20 - bar_len)
                 
-                bar_str = "".join(bar)
                 label = f"Motor {i+1}"
                 motor_label = term.cyan + label + term.normal if group_mode else label
                 
+                # Yellow text if the value on screen differs from what is active on the Pico
                 val_color = term.bold
-                if abs(motors[i] - active_motors[i]) > 0.001:
+                if motors[i] != active_motors[i]:
                     val_color = term.yellow_bold
                 
-                print(f"{prefix}{motor_label}: [{term.green}{bar_str}{term.normal}] {val_color}{motors[i]:.2f}{term.normal}  ")
+                print(f"{prefix}{motor_label}: [{term.green}{bar}{term.normal}] {val_color}{motors[i]}{term.normal} us")
 
+        # Draw Status Area
         with term.location(0, 14):
             print("-" * term.width)
             estop_color = term.red_bold if pico_status["estop"] else term.green
             mode_str = term.yellow_reverse + " LIVE " + term.normal if live_mode else "STAGED"
             sine_str = term.magenta_reverse + " SINE-ON " + term.normal if sine_mode else "OFF"
-            step_display = term.white_on_blue + f" {step_mode} ({current_step}) " + term.normal
             
-            print(f"MODE: {mode_str} | SINE: {sine_str} | STEP: {step_display} | GROUP: {term.cyan}{group_mode}{term.normal}")
-            print(f"E-Stop: {estop_color}{pico_status['estop']}{term.normal} | LAST DEBUG: {term.yellow}{pico_status['debug']}{term.normal}")
+            print(f"MODE: {mode_str} | SINE: {sine_str} | GROUP: {term.cyan}{group_mode}{term.normal} | E-Stop: {estop_color}{pico_status['estop']}{term.normal}")
+            print(f"LAST DEBUG: {term.yellow}{pico_status['debug']}{term.normal}")
 
+        # Handle Input
         key = term.inkey(timeout=0.02)
-        if key.lower() == 'q': break
+        
+        if key.lower() == 'q':
+            break
         elif key.lower() == 's':
             sine_mode = False
-            motors = [0.0] * 8
+            motors = [1500] * 8
             send_motors(motors)
-        elif key.lower() == 'f':
-            if step_mode == "FINE":
-                step_mode = "COARSE"
-                current_step = 0.25
-            else:
-                step_mode = "FINE"
-                current_step = 0.05
         elif key.lower() == 'z':
-            if group_mode: motors = [0.0] * 8
-            else: motors[selected_idx] = 0.0
-            if live_mode: send_motors(motors)
-        elif key.lower() == 'g': group_mode = not group_mode
-        elif key.lower() == 'l': live_mode = not live_mode
-        elif key.lower() == 't': sine_mode = not sine_mode
-        elif key.name == 'KEY_ENTER': send_motors(motors)
+            # Zero (Reset) either the whole group or just the selected motor
+            if group_mode:
+                motors = [1500] * 8
+            else:
+                motors[selected_idx] = 1500
+            if live_mode:
+                send_motors(motors)
+        elif key.lower() == 'g':
+            group_mode = not group_mode
+        elif key.lower() == 'l':
+            live_mode = not live_mode
+        elif key.lower() == 't':
+            sine_mode = not sine_mode
+        elif key.name == 'KEY_ENTER':
+            send_motors(motors)
         
+        # Ramp Logic
         elif key.lower() == 'r':
             while active_motors != motors:
                 for i in range(8):
                     diff = motors[i] - active_motors[i]
-                    ramp_step = 0.05
-                    if abs(diff) <= ramp_step: active_motors[i] = motors[i]
-                    else: active_motors[i] = clamp_and_round(active_motors[i] + (ramp_step if diff > 0 else -ramp_step))
+                    if abs(diff) <= 50: active_motors[i] = motors[i]
+                    else: active_motors[i] += 50 if diff > 0 else -50
                 send_motors(active_motors)
                 time.sleep(0.02)
 
-        # Sinusoidal Test Logic - Full Sweep (-1 to 1)
+        # Sinusoidal Test Logic
         if sine_mode:
-            sine_offset += 0.1 # Slower increment for a smoother full sweep
-            val = clamp_and_round(math.sin(sine_offset)) 
-            if group_mode: motors = [val] * 8
-            else: motors[selected_idx] = val
+            sine_offset += 0.2
+            val = int(1500 + (math.sin(sine_offset) * 100))
+            if group_mode:
+                motors = [val] * 8
+            else:
+                motors[selected_idx] = val
             send_motors(motors)
 
+        # Manual Adjustment Logic
         delta = 0
         if key.name == 'KEY_UP':    selected_idx = (selected_idx - 1) % 8
         elif key.name == 'KEY_DOWN':  selected_idx = (selected_idx + 1) % 8
-        elif key.name == 'KEY_RIGHT': delta = current_step
-        elif key.name == 'KEY_LEFT':  delta = -current_step
+        elif key.name == 'KEY_RIGHT': delta = 50
+        elif key.name == 'KEY_LEFT':  delta = -50
+        elif key.name == 'KEY_SRIGHT': delta = 100
+        elif key.name == 'KEY_SLEFT':  delta = -100
 
         if delta != 0:
             if group_mode:
-                for j in range(8): motors[j] = clamp_and_round(motors[j] + delta)
+                for j in range(8):
+                    motors[j] = max(1000, min(2000, motors[j] + delta))
             else:
-                motors[selected_idx] = clamp_and_round(motors[selected_idx] + delta)
-            if live_mode: send_motors(motors)
+                motors[selected_idx] = max(1000, min(2000, motors[selected_idx] + delta))
+            
+            if live_mode:
+                send_motors(motors)
 
 print("Testing Complete. Motors Neutralized.")

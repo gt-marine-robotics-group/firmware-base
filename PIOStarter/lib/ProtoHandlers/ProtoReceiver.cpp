@@ -24,7 +24,7 @@ ProtoReceiver::ProtoReceiver() {
 
 // Initialize the list globally
 int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
-int32_t ProtoReceiver::motor_commands[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+uint32_t ProtoReceiver::motor_commands[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 bool ProtoReceiver::manual_mode = false;
 
 bool ProtoReceiver::newMessage = false;
@@ -48,14 +48,14 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             // Serial.println("Position updated!");
         }
         if (env.which_payload == Envelope_motor_msg_tag) {
-            motor_commands[0] = env.payload.motor_msg.motor1;
-            motor_commands[1] = env.payload.motor_msg.motor2;
-            motor_commands[2] = env.payload.motor_msg.motor3;
-            motor_commands[3] = env.payload.motor_msg.motor4;
-            motor_commands[4] = env.payload.motor_msg.motor5;
-            motor_commands[5] = env.payload.motor_msg.motor6;
-            motor_commands[6] = env.payload.motor_msg.motor7;
-            motor_commands[7] = env.payload.motor_msg.motor8;
+            motor_commands[0] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor1 * 500.0f));
+            motor_commands[1] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor2 * 500.0f));
+            motor_commands[2] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor3 * 500.0f));
+            motor_commands[3] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor4 * 500.0f));
+            motor_commands[4] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor5 * 500.0f));
+            motor_commands[5] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor6 * 500.0f));
+            motor_commands[6] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor7 * 500.0f));
+            motor_commands[7] = static_cast<uint32_t>(1500.0f + (env.payload.motor_msg.motor8 * 500.0f));
             newMessage = true;
             // Serial.println("Motors updated!");
         }

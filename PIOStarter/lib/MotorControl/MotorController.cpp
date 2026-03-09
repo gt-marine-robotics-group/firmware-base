@@ -46,7 +46,7 @@ bool MotorController::estop(){
     // digitalWrite(config::AI1, LOW);
     // digitalWrite(config::AI2, LOW);
     // analogWrite(config::PWM_OUT, 0);
-    int32_t motorStop[8] = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
+    uint32_t motorStop[8] = {1500, 1500, 1500, 1500, 1500, 1500, 1500, 1500};
     spinMotors(motorStop);
     return true;
 }
@@ -87,7 +87,7 @@ void MotorController::spinMotors(uint8_t* pins, int* PWMs, uint16_t* results, ui
     }
 }
 
-void MotorController::spinMotors(int32_t* motor_commands) {
+void MotorController::spinMotors(uint32_t* motor_commands) {
     // // Safety check
     // for (uint8_t i = 0; i < 8; i++){
     //     if ((motor_commands[i] < 1000) || (motor_commands[i] > 2000)) return;

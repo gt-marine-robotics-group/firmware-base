@@ -25,14 +25,14 @@ typedef struct _positionCommand {
 } positionCommand;
 
 typedef struct _motorCommand {
-    int32_t motor1;
-    int32_t motor2;
-    int32_t motor3;
-    int32_t motor4;
-    int32_t motor5;
-    int32_t motor6;
-    int32_t motor7;
-    int32_t motor8;
+    float motor1;
+    float motor2;
+    float motor3;
+    float motor4;
+    float motor5;
+    float motor6;
+    float motor7;
+    float motor8;
 } motorCommand;
 
 typedef struct _MyMessage {
@@ -109,14 +109,14 @@ X(a, STATIC,   SINGULAR, SINT32,   heave,             6)
 #define positionCommand_DEFAULT NULL
 
 #define motorCommand_FIELDLIST(X, a) \
-X(a, STATIC,   SINGULAR, INT32,    motor1,            1) \
-X(a, STATIC,   SINGULAR, INT32,    motor2,            2) \
-X(a, STATIC,   SINGULAR, INT32,    motor3,            3) \
-X(a, STATIC,   SINGULAR, INT32,    motor4,            4) \
-X(a, STATIC,   SINGULAR, INT32,    motor5,            5) \
-X(a, STATIC,   SINGULAR, INT32,    motor6,            6) \
-X(a, STATIC,   SINGULAR, INT32,    motor7,            7) \
-X(a, STATIC,   SINGULAR, INT32,    motor8,            8)
+X(a, STATIC,   SINGULAR, FLOAT,    motor1,            1) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor2,            2) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor3,            3) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor4,            4) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor5,            5) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor6,            6) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor7,            7) \
+X(a, STATIC,   SINGULAR, FLOAT,    motor8,            8)
 #define motorCommand_CALLBACK NULL
 #define motorCommand_DEFAULT NULL
 
@@ -152,10 +152,10 @@ extern const pb_msgdesc_t Envelope_msg;
 #define Envelope_fields &Envelope_msg
 
 /* Maximum encoded size of messages (where known) */
-#define Envelope_size                            90
+#define Envelope_size                            78
 #define MESSAGE_PB_H_MAX_SIZE                    Envelope_size
 #define MyMessage_size                           76
-#define motorCommand_size                        88
+#define motorCommand_size                        40
 #define operationStatus_size                     4
 #define positionCommand_size                     36
 
