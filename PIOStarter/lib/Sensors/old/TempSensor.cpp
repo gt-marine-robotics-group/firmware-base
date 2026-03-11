@@ -13,7 +13,7 @@
  * @see config.h for the hardware definitions like GPIO mapping
  */
 
-#ifdef HAS_TEMP_SENSOR
+#ifdef HAS_SENSORS
 
 #include "TempSensor.h"
 

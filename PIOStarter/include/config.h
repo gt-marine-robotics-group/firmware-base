@@ -78,7 +78,7 @@ namespace config {
         };  
     #endif
 
-    #ifdef HAS_SENSORS
+    #if defined(HAS_TEMP_SENSOR) || defined(HAS_DOF_SENSOR) 
         static constexpr uint8_t TEMP_SDA = 10;         ///< Sensor I2C SDA pin
         static constexpr uint8_t TEMP_SCL = 11;         ///< Sensor I2C SCL pin
     #endif

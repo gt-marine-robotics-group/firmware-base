@@ -36,6 +36,9 @@
 #elifdef BOARD_EPSILON
     #include "SubPrestoBoard.h"
     SubPrestoBoard myApp;
+#elifdef SENSOR_DEMO
+    #include "SensorTemplateBoard.h"
+    SensorTemplateBoard myApp;
 #endif
 
 // Don't do anything here, try and configure in AppCore for maximum flexibility and cleanliness

@@ -15,21 +15,13 @@
 #ifdef HAS_SENSOR
 
 #include <Arduino.h>
-#include "config.h"
-#include <Wire.h>
-
-// #include <SparkFunLSM9DS1.h>
-
-#include <Adafruit_LSM9DS1.h>
-#include <Adafruit_Sensor.h>  // not used in this demo but required!
 
 
 /**
  * @brief 
- * Acts as a wrapper for the Adafruit sensor library.
- * This class manages initializing and updating the sensor object. 
- * @note Only compiled if the HAS_SENSORS flag is defined in the build environment.
- * Also is tied to the same I2C bus as the TempSensor object.
+ * Acts as a template class for all future implementations of sensors
+ * This class represents how to initialize and update the sensor object. 
+ * @note Only compiled if the HAS_SENSOR flag is defined in the build environment.
  */
 class Sensor{
     public:
@@ -41,17 +33,23 @@ class Sensor{
         Sensor();
 
         /**
+         * @brief Destructor for Sensor object.
+         * @note Likely will not use because this system is not dynamic
+         */
+        virtual ~Sensor() {} // Critical for safe cleanup
+
+        /**
          * @brief Set-up the new Sensor object.
          * @note Initializes hardware.
          */
-        void setup();
+        virtual void setup() = 0;
 
         /**
          * @brief Emergency stop for the Sensor object.
          * @return Whether the e-stop attempt was successful.
          * @note Not implemented due to passive nature of sensors
          */
-        bool estop();
+        virtual bool estop() = 0;
 
         /**
          * @brief Read and print the current sensor data
@@ -59,11 +57,8 @@ class Sensor{
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData();
+        virtual uint16_t readData() = 0;
 
-    private:
-        /// LSM9DS1 imu object, created here so no other class can mess with it (OOP concept)
-        Adafruit_LSM9DS1 imu;
 };
 
 #endif

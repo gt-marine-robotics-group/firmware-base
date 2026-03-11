@@ -1,71 +1,66 @@
 #pragma once
 
 /**
- * @file DOFStick.h
+ * @file TempSensor.h
  * @author Jason Hsiao
  * @date 12/24/2025
  * @version 1.0
  *
- * @brief Header for 9 DOF Stick sensor.
+ * @brief Header for Temperature and Humidity sensor.
  *
- * This file allows you to initialize and manage a accelerometer 
- * and gyroscope sensor breakout board via I2C.
+ * This file allows you to initialize and manage a temperature  
+ * and humidity sensor breakout board via I2C.
  * @see config.h for the hardware definitions like GPIO mapping.
  */
 
-#ifdef HAS_DOF_SENSOR
+#ifdef HAS_SENSORS
 
 #include <Arduino.h>
 #include "config.h"
-#include "Sensor.h"
 #include <Wire.h>
-
-// #include <SparkFunLSM9DS1.h>
-
-#include <Adafruit_LSM9DS1.h>
-#include <Adafruit_Sensor.h>  // not used in this demo but required!
-
+#include "SparkFun_Si7021_Breakout_Library.h"
 
 /**
  * @brief 
- * Acts as a wrapper for the Adafruit sensor library.
+ * Acts as a wrapper for the SparkFun sensor library.
  * This class manages initializing and updating the sensor object. 
  * @note Only compiled if the HAS_SENSORS flag is defined in the build environment.
- * Also is tied to the same I2C bus as the TempSensor object.
+ * Also is tied to the same I2C bus as the DOFStick object.
  */
-class DOFStick : public Sensor{
+class TempSensor{
     public:
         /**
-         * @brief Construct a new DOFStick object.
+         * @brief Construct a new TempSensor object.
          * @note Does not initialize hardware. Use setup() for GPIO/PIO setup 
          * to ensure the hardware is ready after the system clock stabilizes.
          */
-        DOFStick();
+        TempSensor();
 
         /**
-         * @brief Set-up the new DOFStick object.
+         * @brief Set-up the new TempSensor object.
          * @note Initializes hardware.
          */
-        void setup() override;
+        void setup();
 
         /**
-         * @brief Emergency stop for the DOFStick object.
+         * @brief Emergency stop for the TempSensor object.
          * @return Whether the e-stop attempt was successful.
          * @note Not implemented due to passive nature of sensors
          */
-        bool estop() override;
-
+        bool estop();
+        
         /**
          * @brief Read and print the current sensor data
          * @return the current sensor data (currently just a placeholder)
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData() override;
+        uint16_t readData();
 
     private:
-        /// LSM9DS1 imu object, created here so no other class can mess with it (OOP concept)
-        Adafruit_LSM9DS1 imu;
+        /// Si7021 sensor object, created here so no other class can mess with it (OOP concept)
+        SI7021 sensor;
+        
 };
 
 #endif

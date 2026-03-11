@@ -13,11 +13,10 @@
  * @see config.h for the hardware definitions like GPIO mapping.
  */
 
-#ifdef HAS_DOF_SENSOR
+#ifdef HAS_SENSORS
 
 #include <Arduino.h>
 #include "config.h"
-#include "Sensor.h"
 #include <Wire.h>
 
 // #include <SparkFunLSM9DS1.h>
@@ -33,7 +32,7 @@
  * @note Only compiled if the HAS_SENSORS flag is defined in the build environment.
  * Also is tied to the same I2C bus as the TempSensor object.
  */
-class DOFStick : public Sensor{
+class DOFStick{
     public:
         /**
          * @brief Construct a new DOFStick object.
@@ -46,14 +45,14 @@ class DOFStick : public Sensor{
          * @brief Set-up the new DOFStick object.
          * @note Initializes hardware.
          */
-        void setup() override;
+        void setup();
 
         /**
          * @brief Emergency stop for the DOFStick object.
          * @return Whether the e-stop attempt was successful.
          * @note Not implemented due to passive nature of sensors
          */
-        bool estop() override;
+        bool estop();
 
         /**
          * @brief Read and print the current sensor data
@@ -61,7 +60,7 @@ class DOFStick : public Sensor{
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData() override;
+        uint16_t readData();
 
     private:
         /// LSM9DS1 imu object, created here so no other class can mess with it (OOP concept)

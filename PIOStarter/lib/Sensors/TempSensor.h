@@ -13,10 +13,12 @@
  * @see config.h for the hardware definitions like GPIO mapping.
  */
 
-#ifdef HAS_SENSORS
+#ifdef HAS_TEMP_SENSOR
 
 #include <Arduino.h>
 #include "config.h"
+#include "Sensor.h"
+
 #include <Wire.h>
 #include "SparkFun_Si7021_Breakout_Library.h"
 
@@ -27,7 +29,7 @@
  * @note Only compiled if the HAS_SENSORS flag is defined in the build environment.
  * Also is tied to the same I2C bus as the DOFStick object.
  */
-class TempSensor{
+class TempSensor : public Sensor {
     public:
         /**
          * @brief Construct a new TempSensor object.
@@ -40,14 +42,14 @@ class TempSensor{
          * @brief Set-up the new TempSensor object.
          * @note Initializes hardware.
          */
-        void setup();
+        void setup() override;
 
         /**
          * @brief Emergency stop for the TempSensor object.
          * @return Whether the e-stop attempt was successful.
          * @note Not implemented due to passive nature of sensors
          */
-        bool estop();
+        bool estop() override;
         
         /**
          * @brief Read and print the current sensor data
@@ -55,7 +57,7 @@ class TempSensor{
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData();
+        uint16_t readData() override;
 
     private:
         /// Si7021 sensor object, created here so no other class can mess with it (OOP concept)

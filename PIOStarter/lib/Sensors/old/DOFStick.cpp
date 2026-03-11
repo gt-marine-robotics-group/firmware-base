@@ -1,5 +1,5 @@
 /**
- * @file Sensor.cpp
+ * @file DOFStick.cpp
  * @author Jason Hsiao
  * @date 12/24/2025
  * @version 1.0
@@ -13,17 +13,17 @@
  * @see config.h for the hardware definitions like GPIO mapping
  */
 
-#ifdef HAS_SENSOR
+#ifdef HAS_SENSORS
 
-#include "Sensor.h"
+#include "DOFStick.h"
 
 // Constructor
-Sensor::Sensor() {
+DOFStick::DOFStick() {
     // Initialize internal variables if needed
 
 }
 
-void Sensor::setup(){
+void DOFStick::setup(){
     // Set up the I2C object - Unnecessary since already defined in Temp Sensor
     Wire1.setSDA(config::TEMP_SDA);
     Wire1.setSCL(config::TEMP_SCL);
@@ -56,14 +56,14 @@ void Sensor::setup(){
 
 }
 
-bool Sensor::estop(){
+bool DOFStick::estop(){
     // No need to estop a passive sensor
     // but can just end the I2C connection
     return true;
 }
 
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
-uint16_t Sensor::readData() {
+uint16_t DOFStick::readData() {
     // Read acceleration, gyroscope, and magnetometer data
     imu.read();
 

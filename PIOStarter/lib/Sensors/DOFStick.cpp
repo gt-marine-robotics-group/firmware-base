@@ -13,7 +13,7 @@
  * @see config.h for the hardware definitions like GPIO mapping
  */
 
-#ifdef HAS_SENSORS
+#ifdef HAS_DOF_SENSOR
 
 #include "DOFStick.h"
 
