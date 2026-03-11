@@ -70,7 +70,7 @@ class Sensor{
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        virtual uint16_t readData() = 0;
+        virtual SensorData_t readData() = 0;
 
 };
 

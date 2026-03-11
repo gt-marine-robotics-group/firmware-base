@@ -73,6 +73,11 @@ uint16_t DOFStick::readData() {
     // Read accelerometer data
     imu.getEvent(&accel, &gyro, &mag, &temp);
 
+    lastReading.type = SensorData_t::IMU;
+    lastReading.data.accel.x = accel.acceleration.x;
+    lastReading.data.accel.y = accel.acceleration.y;
+    lastReading.data.accel.z = accel.acceleration.z;
+
     // Print Accelerometer Data (in m/s^2)
     Serial.println("Accelerometer Data (m/s^2):");
     Serial.print("X: "); Serial.print(accel.acceleration.x); 
@@ -91,7 +96,7 @@ uint16_t DOFStick::readData() {
     Serial.print(" Y: "); Serial.print(mag.magnetic.y); 
     Serial.print(" Z: "); Serial.println(mag.magnetic.z);
 
-    return 1;
+    return lastReading;
 }
 
 #endif

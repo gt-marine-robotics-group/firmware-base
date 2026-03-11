@@ -61,11 +61,12 @@ class DOFStick : public Sensor{
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData() override;
+        SensorData_t readData() override;
 
     private:
         /// LSM9DS1 imu object, created here so no other class can mess with it (OOP concept)
         Adafruit_LSM9DS1 imu;
+        SensorData_t lastReading;
 };
 
 #endif
