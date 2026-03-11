@@ -16,6 +16,19 @@
 
 #include <Arduino.h>
 
+/**
+ * @brief 
+ * Acts as a boilerplate struct for potential sensor data
+ * @note Only compiled if the HAS_SENSOR flag is defined in the build environment.
+ */
+struct SensorData_t {
+    enum Type { TEMP, IMU, CURRENT } type;
+    union {
+        float temperature;
+        struct { float x, y, z; } accel;
+        float amperage;
+    } data;
+};
 
 /**
  * @brief 
