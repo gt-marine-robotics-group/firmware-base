@@ -40,7 +40,7 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   - NeoPixel RGB LED
 
 Current assignments for Active MRG Firmware/Embedded Projects:
-- Sensing Board Firmware: Shin + Erin (on break)
+- Sensing Board Firmware: Shin + Erin
 - Motor Controller Rewrite: Mahika
 - Advanced Controller (Servo PIO State machine): Mahika, Liam + Jason
 - Bidirectional D-Shot (even more advanced replacement): George
