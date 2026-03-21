@@ -15,6 +15,12 @@ PB_BIND(positionCommand, positionCommand, AUTO)
 PB_BIND(motorCommand, motorCommand, AUTO)
 
 
+PB_BIND(AccelData, AccelData, AUTO)
+
+
+PB_BIND(sensorData, sensorData, AUTO)
+
+
 PB_BIND(MyMessage, MyMessage, AUTO)
 
 

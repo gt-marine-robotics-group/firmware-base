@@ -20,9 +20,10 @@
 #include "config.h"
 #include "LEDPIO.h"
 #include "Estop.h"
-#include "TempSensor.h"
+// #include "TempSensor.h"
 #include "DOFStick.h"
 #include "LEDMux.h"
+#include "ProtoSender.h"
 
 /**
  * @brief 
@@ -42,13 +43,11 @@ public:
      * @todo Maybe consider a name change then lol
      */
     void begin() {
-        Serial.begin(115200);
+        // Serial.begin(115200);
         
         // Only initializes what exists for this specific board
-        estop.setup();
-        ledPIO.setup();
-        tempSensor.setup();
-        imu.setup();
+        sensor.setup();
+        protoSender.setup();
     }
 
     /**
@@ -58,26 +57,59 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        temp = tempSensor.readData();
-        imu.readData();
-        Serial.println("\n\n");
-        // Serial.println(temp);
-        pwm_input = temp;
+        SensorData_t sensorData = sensor.readData();
+        Envelope env = Envelope_init_zero;
+        // // Print Accelerometer Data (in m/s^2)
+        // Serial.println("Accelerometer Data (m/s^2):");
+        // Serial.print("X: "); Serial.print(sensorData.data.accel.x); 
+        // Serial.print(" Y: "); Serial.print(sensorData.data.accel.y); 
+        // Serial.print(" Z: "); Serial.println(sensorData.data.accel.z);
+
+        env.which_payload = Envelope_readings_tag;
+        env.payload.readings.id = (uint32_t)sensorData.type;
+
+        // Handling the Union/OneOf correctly
+        if (sensorData.type == SensorData_t::IMU) {
+            env.payload.readings.which_data = sensorData_accel_tag;
+            env.payload.readings.data.accel.x = sensorData.data.accel.x;
+            env.payload.readings.data.accel.y = sensorData.data.accel.y;
+            env.payload.readings.data.accel.z = sensorData.data.accel.z;
+        } else if (sensorData.type == SensorData_t::TEMP) {
+            env.payload.readings.which_data = sensorData_temperature_tag;
+            env.payload.readings.data.temperature = sensorData.data.temperature;
+        }
+        protoSender.sendData(env);
+        delay(1000);
         
-        // Feed the PIO the new blinking value
-        ledPIO.updateBlink(pwm_input);
-        
-        delay(500);
+        if (cycle == 0) {
+            message = message1;
+        } else if (cycle == 1) {
+            message = message2;
+        } else {
+            message = message3;
+        }
+        cycle = (cycle + 1) % 3;
+        env = Envelope_init_zero;
+        env.which_payload = Envelope_debug_tag;
+        env.payload.debug.id = 86 + cycle;
+        strncpy(env.payload.debug.content, message, sizeof(env.payload.debug.content) - 1);
+        protoSender.sendData(env);
+        delay(1000);
+
     }
 
 private:
     // These objects are only "born" if the build flag is active
-    Estop estop;
-    LEDPIO ledPIO;
-    uint8_t pwm_input = 25;
-    TempSensor tempSensor;
-    uint8_t temp = 25;
-    DOFStick imu;
+    DOFStick sensor;
+    ProtoSender protoSender;
+
+    char* message;
+
+    // Test messages
+    uint8_t cycle = 0;
+    char message1[64] = "These are not the drones you're looking for";
+    char message2[64] = "Understandable have a nice day";
+    char message3[64] = "Wait a min this stuff actually works";
 };
 
 #endif

@@ -49,7 +49,7 @@ bool TempSensor::estop(){
 }
 
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
-uint16_t TempSensor::readData() {
+SensorData_t TempSensor::readData() {
     Serial.print("Humidity: ");
     Serial.print(sensor.getRH(), 2);
     
@@ -58,9 +58,10 @@ uint16_t TempSensor::readData() {
     Serial.print(temp, 2);
     Serial.println("C");
     
-    
+    SensorData_t dummy;
     // delay(1000);
-    return static_cast<uint16_t>(temp);
+    // return static_cast<uint16_t>(temp);
+    return dummy;
 }
 
 #endif

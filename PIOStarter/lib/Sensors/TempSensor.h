@@ -57,7 +57,7 @@ class TempSensor : public Sensor {
          * @todo Make a struct for the sensor data or just directly load the protobuf envelope
          * @see included library for information on sensor operation and usage
          */
-        uint16_t readData() override;
+        SensorData_t readData() override;
 
     private:
         /// Si7021 sensor object, created here so no other class can mess with it (OOP concept)

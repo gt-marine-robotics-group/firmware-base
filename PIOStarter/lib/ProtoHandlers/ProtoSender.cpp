@@ -57,13 +57,24 @@ uint16_t ProtoSender::sendData(){
 }
 
 void ProtoSender::sendStatus(bool estop, bool manual) {
-    uint8_t buffer[128];
+    // uint8_t buffer[128];
     Envelope env = Envelope_init_zero;
     
     // Set the tag so the receiver knows which one it is
     env.which_payload = Envelope_status_tag;
     env.payload.status.estop = estop;
     env.payload.status.manual = manual;
+
+    pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+    if (pb_encode(&stream, Envelope_fields, &env)) {
+        myPacketSerial.send(buffer, stream.bytes_written);
+    }
+    // // Replace the above 3 lines with this:
+    // sendData(env);
+}
+
+void ProtoSender::sendData(Envelope env) {
+    // uint8_t buffer[128];
 
     pb_ostream_t stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
     if (pb_encode(&stream, Envelope_fields, &env)) {

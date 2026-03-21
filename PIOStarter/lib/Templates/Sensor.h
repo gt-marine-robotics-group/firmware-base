@@ -15,6 +15,7 @@
 #ifdef HAS_SENSOR
 
 #include <Arduino.h>
+#include "message.pb.h"
 
 /**
  * @brief 
@@ -43,7 +44,7 @@ class Sensor{
          * @note Does not initialize hardware. Use setup() for GPIO/PIO setup 
          * to ensure the hardware is ready after the system clock stabilizes.
          */
-        Sensor();
+        Sensor() {};
 
         /**
          * @brief Destructor for Sensor object.
@@ -72,6 +73,13 @@ class Sensor{
          */
         virtual SensorData_t readData() = 0;
 
+        // /**
+        //  * @brief Read and print the current sensor data
+        //  * @return the current sensor data (currently just a placeholder)
+        //  * @todo Make a struct for the sensor data or just directly load the protobuf envelope
+        //  * @see included library for information on sensor operation and usage
+        //  */
+        // virtual void loadData(Envelope* envelope) = 0;
 };
 
 #endif
