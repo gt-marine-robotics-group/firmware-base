@@ -18,11 +18,11 @@
 #ifdef SENSOR_DEMO
 
 #include "config.h"
-#include "LEDPIO.h"
-#include "Estop.h"
+// #include "LEDPIO.h"
+// #include "Estop.h"
 // #include "TempSensor.h"
 #include "DOFStick.h"
-#include "LEDMux.h"
+// #include "LEDMux.h"
 #include "ProtoSender.h"
 
 /**
@@ -45,7 +45,7 @@ public:
     void begin() {
         // Serial.begin(115200);
         
-        // Only initializes what exists for this specific board
+        // // Only initializes what exists for this specific board
         sensor.setup();
         protoSender.setup();
     }
@@ -95,7 +95,9 @@ public:
         strncpy(env.payload.debug.content, message, sizeof(env.payload.debug.content) - 1);
         protoSender.sendData(env);
         delay(1000);
-
+        
+        // Serial.println("I am alive");
+        // delay(1000);
     }
 
 private:
