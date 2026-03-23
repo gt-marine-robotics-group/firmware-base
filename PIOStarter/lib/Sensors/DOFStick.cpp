@@ -29,14 +29,30 @@ void DOFStick::setup(){
     Wire1.setSCL(config::TEMP_SCL);
     Wire1.begin();
 
-
-    // 2. Initialize the sensor by passing the Wire1 pointer
+    // // Try this solution later:
+    // // See if ANY device is at the IMU's address (0x6B or 0x1E)
+    // // endTransmission returns 0 only if it gets an ACK from hardware
+    // Wire1.beginTransmission(0x6B); 
+    // if (Wire1.endTransmission() != 0) {
+    //     Serial.println("I2C Hardware Error: No device ACK at 0x6B. Skipping IMU.");
+    //     imu_active = false; // Use a flag to skip imu.read() in your loop
+    // } else {
+    //     imu = Adafruit_LSM9DS1(&Wire1, 0);
+    //     if (!imu.begin()) {
+    //         Serial.println("IMU found but failed to initialize. Check power?");
+    //         imu_active = false;
+    //     } else {
+    //         imu_active = true;
+    //         Serial.println("IMU Online!");
+    //     }
+    // }
+    // Initialize the sensor by passing the Wire1 pointer
     imu = Adafruit_LSM9DS1(&Wire1, 0);
     if (!imu.begin()) {
         Serial.println("9DOF Sensor not detected. Please check connections.");
     }
 
-    // 1.) Set the accelerometer range
+    // Set the accelerometer range
     imu.setupAccel(imu.LSM9DS1_ACCELRANGE_2G, imu.LSM9DS1_ACCELDATARATE_10HZ);
     //imu.setupAccel(imu.LSM9DS1_ACCELRANGE_4G, imu.LSM9DS1_ACCELDATARATE_119HZ);
     //imu.setupAccel(imu.LSM9DS1_ACCELRANGE_8G, imu.LSM9DS1_ACCELDATARATE_476HZ);
