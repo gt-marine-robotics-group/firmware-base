@@ -62,6 +62,7 @@ class TempSensor : public Sensor {
     private:
         /// Si7021 sensor object, created here so no other class can mess with it (OOP concept)
         SI7021 sensor;
+        SensorData_t lastReading;
         
 };
 

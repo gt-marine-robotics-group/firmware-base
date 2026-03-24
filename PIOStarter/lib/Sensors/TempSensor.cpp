@@ -34,7 +34,7 @@ void TempSensor::setup(){
     while (!sensor.begin(Wire1)) {
         Serial.println("Could not find a valid Si7021 sensor, check wiring!");
     }
-    Serial.println("Si7021 initialized!");
+    // Serial.println("Si7021 initialized!");
     
     // Standard set-up stuff
     sensor.setResolution(0); // RH 12-bit, Temp 14-bit (Default)
@@ -50,18 +50,17 @@ bool TempSensor::estop(){
 
 // If syntax here looks weird, my bad, I took some code from 4180 and vibed it to work
 SensorData_t TempSensor::readData() {
-    Serial.print("Humidity: ");
-    Serial.print(sensor.getRH(), 2);
+    // Serial.print("Humidity: ");
+    // Serial.print(sensor.getRH(), 2);
     
-    Serial.print("%\tTemperature: ");
+    // Serial.print("%\tTemperature: ");
     float temp = sensor.getTemperature();
-    Serial.print(temp, 2);
-    Serial.println("C");
+    // Serial.print(temp, 2);
+    // Serial.println("C");
     
-    SensorData_t dummy;
-    // delay(1000);
-    // return static_cast<uint16_t>(temp);
-    return dummy;
+    lastReading.type = SensorData_t::TEMP;
+    lastReading.data.temperature = temp;
+    return lastReading;
 }
 
 #endif

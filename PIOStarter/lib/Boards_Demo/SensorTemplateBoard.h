@@ -20,7 +20,7 @@
 #include "config.h"
 // #include "LEDPIO.h"
 // #include "Estop.h"
-// #include "TempSensor.h"
+#include "TempSensor.h"
 #include "DOFStick.h"
 // #include "LEDMux.h"
 #include "ProtoSender.h"
@@ -46,7 +46,11 @@ public:
         // Serial.begin(115200);
         
         // // Only initializes what exists for this specific board
-        sensor.setup();
+        // dofSensor.setup();
+        // tempSensor.setup();
+        for (Sensor* s : sensors) {
+            s->setup();
+        }
         protoSender.setup();
     }
 
@@ -57,30 +61,29 @@ public:
      */
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
-        SensorData_t sensorData = sensor.readData();
-        Envelope env = Envelope_init_zero;
-        // // Print Accelerometer Data (in m/s^2)
-        // Serial.println("Accelerometer Data (m/s^2):");
-        // Serial.print("X: "); Serial.print(sensorData.data.accel.x); 
-        // Serial.print(" Y: "); Serial.print(sensorData.data.accel.y); 
-        // Serial.print(" Z: "); Serial.println(sensorData.data.accel.z);
+        // SensorData_t sensorData = dofSensor.readData();
+        for (Sensor* s : sensors) {
+            sensorData = s->readData();
+            env = Envelope_init_zero;
 
-        env.which_payload = Envelope_readings_tag;
-        env.payload.readings.id = (uint32_t)sensorData.type;
+            env.which_payload = Envelope_readings_tag;
+            env.payload.readings.id = (uint32_t)sensorData.type;
 
-        // Handling the Union/OneOf correctly
-        if (sensorData.type == SensorData_t::IMU) {
-            env.payload.readings.which_data = sensorData_accel_tag;
-            env.payload.readings.data.accel.x = sensorData.data.accel.x;
-            env.payload.readings.data.accel.y = sensorData.data.accel.y;
-            env.payload.readings.data.accel.z = sensorData.data.accel.z;
-        } else if (sensorData.type == SensorData_t::TEMP) {
-            env.payload.readings.which_data = sensorData_temperature_tag;
-            env.payload.readings.data.temperature = sensorData.data.temperature;
+            // @Ariana, See if there's a more efficient packing technique 
+            // (either I2C DMA or Helper Function for respective sensor)
+            if (sensorData.type == SensorData_t::IMU) {
+                env.payload.readings.which_data = sensorData_accel_tag;
+                env.payload.readings.data.accel.x = sensorData.data.accel.x;
+                env.payload.readings.data.accel.y = sensorData.data.accel.y;
+                env.payload.readings.data.accel.z = sensorData.data.accel.z;
+            } else if (sensorData.type == SensorData_t::TEMP) {
+                env.payload.readings.which_data = sensorData_temperature_tag;
+                env.payload.readings.data.temperature = sensorData.data.temperature;
+            }
+            protoSender.sendData(env);
+            delay(500);
         }
-        protoSender.sendData(env);
-        delay(1000);
-        
+
         if (cycle == 0) {
             message = message1;
         } else if (cycle == 1) {
@@ -95,15 +98,18 @@ public:
         strncpy(env.payload.debug.content, message, sizeof(env.payload.debug.content) - 1);
         protoSender.sendData(env);
         delay(1000);
-        
-        // Serial.println("I am alive");
-        // delay(1000);
     }
 
 private:
     // These objects are only "born" if the build flag is active
-    DOFStick sensor;
+    DOFStick dofSensor;
+    TempSensor tempSensor;
     ProtoSender protoSender;
+    Sensor* sensors[2] = { &tempSensor, &dofSensor };
+    
+    // Global Data Containers
+    Envelope env;
+    SensorData_t sensorData;
 
     char* message;
 
