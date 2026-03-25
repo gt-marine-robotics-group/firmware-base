@@ -13,6 +13,8 @@ def find_pico_port():
     ports = serial.tools.list_ports.comports()
     for port in ports:
         if port.vid == 0x2E8A or "Pico" in port.description:
+            print("Dectected: ")
+            print(port)
             return port.device
     return None
 

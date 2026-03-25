@@ -39,6 +39,9 @@
 #elifdef SENSOR_DEMO
     #include "SensorTemplateBoard.h"
     SensorTemplateBoard myApp;
+#elifdef SENSOR_RTOS_DEMO
+    #include "SensorRTOSTemplateBoard.h"
+    SensorRTOSTemplateBoard myApp;
 #endif
 
 // Don't do anything here, try and configure in AppCore for maximum flexibility and cleanliness
