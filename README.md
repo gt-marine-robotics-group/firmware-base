@@ -95,10 +95,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
   Edit from 2/8: Priority for this has increased. Protobuf doesn't have interrupts, which means that we will start missing packets if any task takes too long. This means that it is officially time for RTOS.  
   Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
 
-- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
-  Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Am currently debugging through the Protobuf receiver like a debug UART.
-  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples.
-
 - **Further compiler related considerations - ADVANCED - OPTIONAL**  
   Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
   Could consider Interface-based design or the Null Object Pattern is apparently a thing where you make a null object that acts as a stand-in to brick when called, eliminating the need for all build flags outside of the classes themselves.
@@ -210,7 +206,12 @@ This is essentially stretch goals or developing new features. Our basic framewor
       - **Memory and Packet Design - INTERMEDIATE - OPTIONAL**    
   Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication. Protobuf and COBS are already mad efficient so you'd have to be using structs and memory mapping to do this, might actually be ADVANCED.
 
-
+17.  **Pico Probe working for debugging purposes**  
+   Added a utility folder with helper .uf2 files for debugging, as well as debugging environments to the platform.ini.  
+- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
+  Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Am currently debugging through the Protobuf receiver like a debug UART.
+  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples.
+  
 ## Graveyard  
 This section is for interesting ideas that realistically will not happen. If you're super cool and wanna be a necromancer or whatever, I would consider trying these out because these are very interesting project ideas that will strengthen your understanding of firmware and using the Pi Pico, and could also be a flex with resume or career fair discussion. Just this career fair, I spent 40 minutes talking about some of the fancy PIO stuff I'm trying, so this could help you too.
 - ~~**I2C Data Collection through PIO - ADVANCED**  
