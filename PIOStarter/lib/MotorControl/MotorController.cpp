@@ -19,6 +19,15 @@
 
 #include "MotorController.h"
 
+_107_::Servo MotorController::motor1;
+_107_::Servo MotorController::motor2;
+_107_::Servo MotorController::motor3;
+_107_::Servo MotorController::motor4;
+_107_::Servo MotorController::motor5;
+_107_::Servo MotorController::motor6;
+_107_::Servo MotorController::motor7;
+_107_::Servo MotorController::motor8;
+
 // Constructor
 MotorController::MotorController() {
     // Initialize internal variables if needed
@@ -27,18 +36,21 @@ MotorController::MotorController() {
 
 // TODO: instantiate variable amounts of PWM outputs (defined in config.h)
 bool MotorController::setup(){
+    static _107_::Servo motors[8];
     // pinMode(config::PWM_OUT, OUTPUT);
     // pinMode(config::AI1, OUTPUT);
     // pinMode(config::AI2, OUTPUT);
+    // verify pin numbers here, this was based on KiCAD schematic
     bool motorsAttached = true;
-    if (!motor1.attach(config::MOTOR_1)) motorsAttached = false;
-    if (!motor2.attach(config::MOTOR_2)) motorsAttached = false;
-    if (!motor3.attach(config::MOTOR_3)) motorsAttached = false;
-    if (!motor4.attach(config::MOTOR_4)) motorsAttached = false;
-    if (!motor5.attach(config::MOTOR_5)) motorsAttached = false;
-    if (!motor6.attach(config::MOTOR_6)) motorsAttached = false;
-    if (!motor7.attach(config::MOTOR_7)) motorsAttached = false;
-    if (!motor8.attach(config::MOTOR_8)) motorsAttached = false;
+    motor1.attach(1);
+    motor2.attach(2);
+    motor3.attach(3);
+    motor4.attach(4);
+    motor5.attach(5);
+    motor6.attach(6);
+    motor7.attach(7);
+    motor8.attach(8);
+
     return motorsAttached;
 }
 
