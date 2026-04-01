@@ -40,7 +40,7 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   - NeoPixel RGB LED
 
 Current assignments for Active MRG Firmware/Embedded Projects:
-- Sensing Board Firmware: Shin + Erin (on break)
+- Sensing Board Firmware: Shin + Erin
 - Motor Controller Rewrite: Mahika
 - Advanced Controller (Servo PIO State machine): Mahika, Liam + Jason
 - Bidirectional D-Shot (even more advanced replacement): George
@@ -73,12 +73,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
   I wrote a super cool Programmable IO script that handles all of our light tower needs, but I didn't realize that the light tower is active low. I designed it so that you could add variable-length sequences of blinking patterns, but this new meant that I had to ignore all 0 inputs. This means that we will need to modify our light tower logic to be inverted, either by flipping all bits when outputting or flipping the read-in logic to ignore all 1s (which might be harder).
   Would like to note though, at the moment this should work for everything else besides turning on all the LEDs.
 
-- **Clean-up Protobuf-ROS Bridge - INTERMEDIATE**  
-  The bare minimum implementation is done but there are several things that might need to get fixed
-  1. the protobuf set-up is blocking, I've temporarily added a change that should fix it but haven't tested it yet.
-  2. we moved the protobuf definitions outside of the firmware folder so that mitchell could use it for ROS, but I haven't merged those changes yet.
-  3. Whoever merges the changes will probably also need to write the ROS pub/sub on the other side.
-
 - **Torpedo - INTERMEDIATE**  
   Not included in this firmware base but just for record-keeping
   
@@ -97,19 +91,9 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
   Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
   Edit from first week: Everyone seems to be pro board.h files so we'll use that until we get too many boards.
 
-- **Divide per Project - ADVANCED**  
-  Follow-up to above bulle point. This is going to take most of the semester, but as of 2/8 we have now reached the point where the firmware will need to be customized per project. The best way to do that is how I outlined it below under Further Compiler Related Considerations. Ideally we would use inheritance and implement virtual/abstract functions to gurantee a shared semblance of structure between similar classes (i.e. all sensors have a template of readData(), set-up(), and internal error-handling, so that other classes that rely on this data formatting can trust it, like a Protobuf sender that expects a specific formatting)
-
 - **RTOS - BEGINNER/INTERMEDIATE**  
   Edit from 2/8: Priority for this has increased. Protobuf doesn't have interrupts, which means that we will start missing packets if any task takes too long. This means that it is officially time for RTOS.  
   Everything is currently super-looped, we can add optionality for RTOS if we want more concurrent operation. Should be fairly straightforward (BEGINNER) if you're just implementing it, might be closer to INTERMEDIATE if you start doing system design stuff and timeslicing with your modules.
-
-- **Memory and Packet Design - INTERMEDIATE - OPTIONAL**  
-  Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication. Protobuf and COBS are already mad efficient so you'd have to be using structs and memory mapping to do this, might actually be ADVANCED.
-
-- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
-  Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Will currently debug through the Protobuf receiver.
-  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples, but I only have one Pi Pico with me. Could also consider just using a simple debug UART to make life easier.
 
 - **Further compiler related considerations - ADVANCED - OPTIONAL**  
   Theoretically Dead Code Elimination means you shouldn't need to worry about #ifdef in the library, but I put flags just to quiet the errors for now, and also moved the flags from config to platform.ini to make them more global.  
@@ -124,9 +108,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 This is essentially stretch goals or developing new features. Our basic framework covers simple firmware features, but given the cool possibilities enabled by the Pico, this is where we puruse stretch goals with PIO, DMA, and Protobuf.
 #### Roadmap: <br> R&D project so when possible (Semester) <br> <br> Ideal: <br> INTERMEDIATE done by Spring Break (2.5 months) <br> Significant progress on first 2 ADVANCED by end of semester (4 months) <br> Last 2 ADVANCED next semester - I'll have graduated by then rip
 
-- **PIO Servo Controller - ADVANCED (ALMOST CRACKHEAD)**
-  They had the right idea with the PIO State machines for Servo operation, but we condense the operation of all 8 servos into 2 state machines that control 4 motors each (with the same 8 bit resolution). Operation will be similar to the Programmable IO LED Mux with constant bit shifting and output. 
-  
 - **DMA Controller - ADVANCED**  
   If we implement any communication protocols over PIO, we will probably need to load it directly into memory due to bandwidth constraints. Even cooler though, if you get DMA working you can actually implement software interrupts :O
   There's an example using UART to do it, so we should proably start there and then port it over to SPI/I2C:  
@@ -204,6 +185,33 @@ This is essentially stretch goals or developing new features. Our basic framewor
 13. **RoboBoat firmware and Modified EStop**  
     Just the bare minimum implementation in advance of the 2/7 water test, but there are several changes that need to be made, see above under implementation
 
+14. **Protobuf-ROS Bridge is merged in to main**
+    Represents the following task, shout-out Mahika for handling the pull request:
+    
+    - **Clean-up Protobuf-ROS Bridge - INTERMEDIATE**  
+  The bare minimum implementation is done but there are several things that might need to get fixed
+     1. the protobuf set-up is blocking, I've temporarily added a change that should fix it but haven't tested it yet.
+     2. we moved the protobuf definitions outside of the firmware folder so that mitchell could use it for ROS, but I haven't merged those changes yet.
+     3. Whoever merges the changes will probably also need to write the ROS pub/sub on the other side.
+ 
+15. **New Python Testing Environment**   
+    While working on RoboSub, made a significantly improved testing framework:  
+    - Python virtual environment to manage dependencies  
+    - Using Blessed python package to make CLI displays for easily testing the firmware over Protobuf, including Motor Controller, Sensors, Debug messages
+
+16.  **Inheritance framework implemented with Demo Sensors**  
+    Represents the following 2 tasks, but only primitively implemented:  
+      - **Divide per Project - ADVANCED**  
+  Follow-up to above bulle point. This is going to take most of the semester, but as of 2/8 we have now reached the point where the firmware will need to be customized per project. The best way to do that is how I outlined it below under Further Compiler Related Considerations. Ideally we would use inheritance and implement virtual/abstract functions to gurantee a shared semblance of structure between similar classes (i.e. all sensors have a template of readData(), set-up(), and internal error-handling, so that other classes that rely on this data formatting can trust it, like a Protobuf sender that expects a specific formatting)  
+      - **Memory and Packet Design - INTERMEDIATE - OPTIONAL**    
+  Protobuf is packed pretty well, and at the moment we don't have much memory usage, but this is just something to look into for more efficient communication. Protobuf and COBS are already mad efficient so you'd have to be using structs and memory mapping to do this, might actually be ADVANCED.
+
+17.  **Pico Probe working for debugging purposes**  
+   Added a utility folder with helper .uf2 files for debugging, as well as debugging environments to the platform.ini.  
+- **Debugging capabilities - INTERMEDIATE/ADVANCED**  
+  Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Am currently debugging through the Protobuf receiver like a debug UART.
+  Look into picoprobe. Also seems pretty straightforward since there are plenty of examples.
+  
 ## Graveyard  
 This section is for interesting ideas that realistically will not happen. If you're super cool and wanna be a necromancer or whatever, I would consider trying these out because these are very interesting project ideas that will strengthen your understanding of firmware and using the Pi Pico, and could also be a flex with resume or career fair discussion. Just this career fair, I spent 40 minutes talking about some of the fancy PIO stuff I'm trying, so this could help you too.
 - ~~**I2C Data Collection through PIO - ADVANCED**  
@@ -219,6 +227,11 @@ This section is for interesting ideas that realistically will not happen. If you
 - ~~**SPI Data collection through PIO - INTERMEDIATE**  
   Implementing SPI Data collection through PIO. Should be the easiest between SPI/I2C/DMA, but not easy at all.
   [PIO SPI](https://github.com/raspberrypi/pico-examples/tree/master/pio/spi)~~
+
+  
+- ~~**PIO Servo Controller - ADVANCED (ALMOST CRACKHEAD)**
+  They had the right idea with the PIO State machines for Servo operation, but we condense the operation of all 8 servos into 2 state machines that control 4 motors each (with the same 8 bit resolution). Operation will be similar to the Programmable IO LED Mux with constant bit shifting and output.~~ 
+  
 
 ## Video demo
 <video src="https://github.gatech.edu/user-attachments/assets/e94030c5-7b0a-4ca9-8309-5265b8febaf2" controls>

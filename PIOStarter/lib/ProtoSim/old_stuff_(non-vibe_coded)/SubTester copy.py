@@ -13,8 +13,6 @@ def find_pico_port():
     ports = serial.tools.list_ports.comports()
     for port in ports:
         if port.vid == 0x2E8A or "Pico" in port.description:
-            print("Dectected: ")
-            print(port)
             return port.device
     return None
 
@@ -36,20 +34,14 @@ sine_mode = False
 sine_offset = 0.0
 
 # Stepping Logic
-step_mode = "FINE"
+step_mode = "FINE"  # Can be "FINE" or "COARSE"
 current_step = 0.05
-
-# Sensor & Status State
-pico_status = {"estop": False, "manual": False, "debug": "No messages yet"}
-sensors = {
-    "temp": 0.0,
-    "amp": 0.0,
-    "accel": {"x": 0.0, "y": 0.0, "z": 0.0}
-}
 
 last_send_time = 0
 MIN_SEND_INTERVAL = 0.02  
 HEARTBEAT_INTERVAL = 0.1   
+
+pico_status = {"estop": False, "manual": False, "debug": "No messages yet"}
 
 def clamp_and_round(val):
     return round(max(-1.0, min(1.0, val)), 2)
@@ -81,41 +73,6 @@ def heartbeat_loop():
             send_motors(target)
         time.sleep(0.01)
 
-# def listener():
-#     buffer = bytearray()
-#     while True:
-#         try:
-#             if ser.in_waiting > 0:
-#                 data = ser.read(ser.in_waiting)
-#                 buffer.extend(data)
-#                 while b'\x00' in buffer:
-#                     packet, buffer = buffer.split(b'\x00', 1)
-#                     if not packet: continue
-#                     try:
-#                         decoded = cobs.decode(packet)
-#                         env = message_pb2.Envelope()
-#                         env.ParseFromString(decoded)
-#                         ptype = env.WhichOneof("payload")
-                        
-#                         if ptype == "status":
-#                             pico_status["estop"] = env.status.estop
-#                             pico_status["manual"] = env.status.manual
-#                         elif ptype == "debug":
-#                             pico_status["debug"] = env.debug.content
-#                         elif ptype == "readings":
-#                             stype = env.readings.WhichOneof("data")
-#                             if stype == "temperature":
-#                                 sensors["temp"] = env.readings.temperature
-#                             elif stype == "amperage":
-#                                 sensors["amp"] = env.readings.amperage
-#                             elif stype == "accel":
-#                                 sensors["accel"]["x"] = env.readings.accel.x
-#                                 sensors["accel"]["y"] = env.readings.accel.y
-#                                 sensors["accel"]["z"] = env.readings.accel.z
-#                     except: pass
-#             time.sleep(0.01)
-#         except Exception: break
-
 def listener():
     buffer = bytearray()
     while True:
@@ -131,32 +88,14 @@ def listener():
                         env = message_pb2.Envelope()
                         env.ParseFromString(decoded)
                         ptype = env.WhichOneof("payload")
-                        
                         if ptype == "status":
                             pico_status["estop"] = env.status.estop
                             pico_status["manual"] = env.status.manual
                         elif ptype == "debug":
-                            # Updated to capture BOTH ID and Content
-                            pico_status["debug_id"] = env.debug.id
                             pico_status["debug"] = env.debug.content
-                        elif ptype == "readings":
-                            stype = env.readings.WhichOneof("data")
-                            if stype == "temperature":
-                                sensors["temp"] = env.readings.temperature
-                            elif stype == "amperage":
-                                sensors["amp"] = env.readings.amperage
-                            elif stype == "accel":
-                                sensors["accel"] = {
-                                    "x": env.readings.accel.x,
-                                    "y": env.readings.accel.y,
-                                    "z": env.readings.accel.z
-                                }
                     except: pass
             time.sleep(0.01)
         except Exception: break
-
-# Initialize the new state key
-pico_status["debug_id"] = 0
 
 # --- 4. Main UI & Control ---
 t_listen = threading.Thread(target=listener, daemon=True)
@@ -168,13 +107,11 @@ t_heart.start()
 with term.fullscreen(), term.cbreak(), term.hidden_cursor():
     print(term.clear)
     while True:
-        # Header
         with term.location(0, 0):
-            print(term.blue_bold + "--- Marine Robotics: Static Firmware Tester ---" + term.normal)
-            print(f"Port: {detected_port} | {term.bold}F{term.normal}: Toggle Step | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero | {term.bold}ENTER{term.normal}: Send")
+            print(term.blue_bold + "--- Marine Robotics: Precise Float Tester ---" + term.normal)
+            print(f"Port: {detected_port} | {term.bold}F{term.normal}: Toggle Step | {term.bold}T{term.normal}: Sine | {term.bold}Z{term.normal}: Zero | {term.bold}L{term.normal}: Live")
             print("-" * term.width)
 
-        # Motor Column (Left Side)
         for i in range(8):
             with term.location(2, 4 + i):
                 prefix = term.black_on_white + "> " + term.normal if i == selected_idx else "  "
@@ -198,53 +135,18 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
                 if abs(motors[i] - active_motors[i]) > 0.001:
                     val_color = term.yellow_bold
                 
-                # Clear the line slightly more to prevent overlapping
-                print(f"{prefix}{motor_label}: [{term.green}{bar_str}{term.normal}] {val_color}{motors[i]:.2f}{term.normal}      ")
-
-        # Sensor Side Panel (Pushed further Right to X=60)
-        # This keeps it clear of the bars and labels
-        with term.location(60, 4):
-            print(term.bold + "SENSOR TELEMETRY" + term.normal)
-        with term.location(60, 5):
-            print(f"Temp: {term.yellow}{sensors['temp']:.1f}°C{term.normal}   ")
-        with term.location(60, 6):
-            print(f"Amp:  {term.red}{sensors['amp']:.2f} A{term.normal}    ")
-        with term.location(60, 7):
-            print(f"Accel X: {sensors['accel']['x']:.2f} g  ")
-        with term.location(60, 8):
-            print(f"Accel Y: {sensors['accel']['y']:.2f} g  ")
-        with term.location(60, 9):
-            print(f"Accel Z: {sensors['accel']['z']:.2f} g  ")
-
-        # # Bottom Status Area
-        # with term.location(0, 14):
-        #     print("-" * term.width)
-        #     estop_color = term.red_bold if pico_status["estop"] else term.green
-        #     mode_str = term.yellow_reverse + " LIVE " + term.normal if live_mode else "STAGED"
-        #     sine_str = term.magenta_reverse + " SINE-ON " + term.normal if sine_mode else "OFF"
-        #     step_display = term.white_on_blue + f" {step_mode} ({current_step}) " + term.normal
-            
-        #     print(f"MODE: {mode_str} | SINE: {sine_str} | STEP: {step_display} | GROUP: {term.cyan}{group_mode}{term.normal}")
-        #     print(f"E-Stop: {estop_color}{pico_status['estop']}{term.normal} | LAST DEBUG: {term.yellow}{pico_status['debug']}{term.normal}   ")
+                print(f"{prefix}{motor_label}: [{term.green}{bar_str}{term.normal}] {val_color}{motors[i]:.2f}{term.normal}  ")
 
         with term.location(0, 14):
-            # 1. Clear the lines before drawing to prevent horizontal artifacts
-            print(term.clear_eol + "-" * term.width)
-            
+            print("-" * term.width)
             estop_color = term.red_bold if pico_status["estop"] else term.green
             mode_str = term.yellow_reverse + " LIVE " + term.normal if live_mode else "STAGED"
             sine_str = term.magenta_reverse + " SINE-ON " + term.normal if sine_mode else "OFF"
             step_display = term.white_on_blue + f" {step_mode} ({current_step}) " + term.normal
             
-            # Line 15: Status Row
-            print(term.clear_eol + f"MODE: {mode_str} | SINE: {sine_str} | STEP: {step_display} | GROUP: {term.cyan}{group_mode}{term.normal}")
-            
-            # Line 16: Debug Row
-            # Added debug_id and term.clear_eol to wipe trailing characters
-            debug_info = f"[{pico_status['debug_id']}] {pico_status['debug']}"
-            print(term.clear_eol + f"E-Stop: {estop_color}{pico_status['estop']}{term.normal} | LAST DEBUG: {term.yellow}{debug_info}{term.normal}")
-        
-        # Input Handling
+            print(f"MODE: {mode_str} | SINE: {sine_str} | STEP: {step_display} | GROUP: {term.cyan}{group_mode}{term.normal}")
+            print(f"E-Stop: {estop_color}{pico_status['estop']}{term.normal} | LAST DEBUG: {term.yellow}{pico_status['debug']}{term.normal}")
+
         key = term.inkey(timeout=0.02)
         if key.lower() == 'q': break
         elif key.lower() == 's':
@@ -253,9 +155,11 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             send_motors(motors)
         elif key.lower() == 'f':
             if step_mode == "FINE":
-                step_mode, current_step = "COARSE", 0.25
+                step_mode = "COARSE"
+                current_step = 0.25
             else:
-                step_mode, current_step = "FINE", 0.05
+                step_mode = "FINE"
+                current_step = 0.05
         elif key.lower() == 'z':
             if group_mode: motors = [0.0] * 8
             else: motors[selected_idx] = 0.0
@@ -275,15 +179,14 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
                 send_motors(active_motors)
                 time.sleep(0.02)
 
-        # Sinusoidal Sweep Logic (Full -1 to 1)
+        # Sinusoidal Test Logic - Full Sweep (-1 to 1)
         if sine_mode:
-            sine_offset += 0.1
-            val = clamp_and_round(math.sin(sine_offset))
+            sine_offset += 0.1 # Slower increment for a smoother full sweep
+            val = clamp_and_round(math.sin(sine_offset)) 
             if group_mode: motors = [val] * 8
             else: motors[selected_idx] = val
             send_motors(motors)
 
-        # Adjustment Logic
         delta = 0
         if key.name == 'KEY_UP':    selected_idx = (selected_idx - 1) % 8
         elif key.name == 'KEY_DOWN':  selected_idx = (selected_idx + 1) % 8

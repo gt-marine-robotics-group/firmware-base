@@ -1,4 +1,5 @@
 syntax = "proto3";
+// import "nanopb/options.proto";
 
 message operationStatus {
     bool estop = 1;     // Whether EStop is engaged
@@ -36,6 +37,21 @@ message motorCommand {
     float motor8 = 8;      
 }
 
+message AccelData {
+    float x = 1;
+    float y = 2;
+    float z = 3;
+}
+
+message sensorData {
+    uint32 id = 1;
+    oneof data {
+        float temperature = 2;
+        AccelData accel = 3;
+        float amperage = 4;
+    }       
+}
+
 message MyMessage {
     int32 id = 1;
     string content = 2;
@@ -47,5 +63,6 @@ message Envelope {
         positionCommand pos = 2;
         MyMessage debug = 3;
         motorCommand motor_msg = 4;
+        sensorData readings = 5;
     }
 }

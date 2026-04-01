@@ -82,4 +82,9 @@ namespace config {
         static constexpr uint8_t TEMP_SDA = 10;         ///< Sensor I2C SDA pin
         static constexpr uint8_t TEMP_SCL = 11;         ///< Sensor I2C SCL pin
     #endif
+
+    #ifdef HAS_STATUS_LIGHT
+        static constexpr uint8_t LED_PIN = 26;         ///< Sensor I2C SDA pin
+        static constexpr uint8_t NUM_LEDS = 1;
+    #endif
 }

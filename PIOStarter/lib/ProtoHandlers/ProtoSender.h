@@ -69,6 +69,14 @@ class ProtoSender{
          */
         void sendStatus(bool estop, bool manual);
 
+        /**
+         * @brief Read and print the current sensor data
+         * @return the current sensor data (currently just a placeholder)
+         * @todo Make a struct for the sensor data or just directly load the protobuf envelope
+         * @see included library for information on sensor operation and usage
+         */
+        void sendData(Envelope env);
+
     private:
         PacketSerial myPacketSerial;
         

@@ -15,7 +15,7 @@
  */
 
  
-#ifdef SENSOR_DEMO
+#ifdef SENSOR_RTOS_DEMO
 
 #include "config.h"
 // #include "LEDPIO.h"
@@ -23,6 +23,7 @@
 #include "TempSensor.h"
 #include "DOFStick.h"
 // #include "LEDMux.h"
+#include "StatusLight.h"
 #include "ProtoSender.h"
 
 /**
@@ -35,7 +36,7 @@
  * @note Is the equivalent of the main.cpp in most applications, 
  * but is abstracted for modularity and customizability.
  */
-class SensorTemplateBoard {
+class SensorRTOSTemplateBoard {
 public:
     /**
      * @brief Set-up all of our modules and the Serial monitor.
@@ -52,6 +53,7 @@ public:
             s->setup();
         }
         protoSender.setup();
+        light.setup();
     }
 
     /**
@@ -62,6 +64,7 @@ public:
     void update() {
         // CPU doesn't need to worry about the PIO running in the background
         // SensorData_t sensorData = dofSensor.readData();
+        light.on();
         for (Sensor* s : sensors) {
             sensorData = s->readData();
             env = Envelope_init_zero;
@@ -83,7 +86,7 @@ public:
             protoSender.sendData(env);
             delay(100);
         }
-
+        light.off();
         if (cycle == 0) {
             message = message1;
         } else if (cycle == 1) {
@@ -112,6 +115,8 @@ private:
     SensorData_t sensorData;
 
     char* message;
+
+    StatusLight light;
 
     // Test messages
     uint8_t cycle = 0;

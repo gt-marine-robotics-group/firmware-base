@@ -19,6 +19,7 @@
 #include "config.h"
 #include "Sensor.h"
 #include <Wire.h>
+#include "message.pb.h"
 
 // #include <SparkFunLSM9DS1.h>
 
@@ -62,6 +63,14 @@ class DOFStick : public Sensor{
          * @see included library for information on sensor operation and usage
          */
         SensorData_t readData() override;
+
+        // /**
+        // //  * @brief Read and load the current sensor data into an envelope
+        // //  * @param envelope pointer to the envelope we need to return
+        // //  * @todo Make a struct for the sensor data or just directly load the protobuf envelope
+        // //  * @see included library for information on sensor operation and usage
+        // //  */
+        // void loadData(Envelope* envelope) override;
 
     private:
         /// LSM9DS1 imu object, created here so no other class can mess with it (OOP concept)

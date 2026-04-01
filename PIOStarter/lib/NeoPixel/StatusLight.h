@@ -14,14 +14,11 @@
  * tuned clock dividers.
  */
 
- #ifdef HAS_STATUS_LIGHT
+#ifdef HAS_STATUS_LIGHT
 
 #include <Adafruit_NeoPixel.h>
 
-#define LED_PIN     8     // Data pin connected to onboard RGB LED
-#define NUM_LEDS    1     // Only one LED on board
-
-Adafruit_NeoPixel pixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixel(config::NUM_LEDS, config::LED_PIN, NEO_GRB + NEO_KHZ800);
 
 /**
  * @brief 
@@ -31,11 +28,21 @@ Adafruit_NeoPixel pixel(NUM_LEDS, LED_PIN, NEO_GRB + NEO_KHZ800);
  */
 class StatusLight{
     public:
-        StatusLight();
+        StatusLight(){};
 
         void setup() {
             pixel.begin();           // Initialize NeoPixel
             pixel.setBrightness(20); // Make it less bright!
+        }
+
+        void on() {
+            pixel.setPixelColor(0, pixel.Color(255, 0, 0)); // Display Red
+            pixel.show();
+        }
+
+        void off(){
+            pixel.setPixelColor(0, pixel.Color(0, 0, 0));   // Off
+            pixel.show();
         }
 
         void blink() {

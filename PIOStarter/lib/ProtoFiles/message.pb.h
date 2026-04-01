@@ -35,6 +35,22 @@ typedef struct _motorCommand {
     float motor8;
 } motorCommand;
 
+typedef struct _AccelData {
+    float x;
+    float y;
+    float z;
+} AccelData;
+
+typedef struct _sensorData {
+    uint32_t id;
+    pb_size_t which_data;
+    union {
+        float temperature;
+        AccelData accel;
+        float amperage;
+    } data;
+} sensorData;
+
 typedef struct _MyMessage {
     int32_t id;
     char content[64];
@@ -47,6 +63,7 @@ typedef struct _Envelope {
         positionCommand pos;
         MyMessage debug;
         motorCommand motor_msg;
+        sensorData readings;
     } payload;
 } Envelope;
 
@@ -59,11 +76,15 @@ extern "C" {
 #define operationStatus_init_default             {0, 0}
 #define positionCommand_init_default             {0, 0, 0, 0, 0, 0}
 #define motorCommand_init_default                {0, 0, 0, 0, 0, 0, 0, 0}
+#define AccelData_init_default                   {0, 0, 0}
+#define sensorData_init_default                  {0, 0, {0}}
 #define MyMessage_init_default                   {0, ""}
 #define Envelope_init_default                    {0, {operationStatus_init_default}}
 #define operationStatus_init_zero                {0, 0}
 #define positionCommand_init_zero                {0, 0, 0, 0, 0, 0}
 #define motorCommand_init_zero                   {0, 0, 0, 0, 0, 0, 0, 0}
+#define AccelData_init_zero                      {0, 0, 0}
+#define sensorData_init_zero                     {0, 0, {0}}
 #define MyMessage_init_zero                      {0, ""}
 #define Envelope_init_zero                       {0, {operationStatus_init_zero}}
 
@@ -84,12 +105,20 @@ extern "C" {
 #define motorCommand_motor6_tag                  6
 #define motorCommand_motor7_tag                  7
 #define motorCommand_motor8_tag                  8
+#define AccelData_x_tag                          1
+#define AccelData_y_tag                          2
+#define AccelData_z_tag                          3
+#define sensorData_id_tag                        1
+#define sensorData_temperature_tag               2
+#define sensorData_accel_tag                     3
+#define sensorData_amperage_tag                  4
 #define MyMessage_id_tag                         1
 #define MyMessage_content_tag                    2
 #define Envelope_status_tag                      1
 #define Envelope_pos_tag                         2
 #define Envelope_debug_tag                       3
 #define Envelope_motor_msg_tag                   4
+#define Envelope_readings_tag                    5
 
 /* Struct field encoding specification for nanopb */
 #define operationStatus_FIELDLIST(X, a) \
@@ -120,6 +149,22 @@ X(a, STATIC,   SINGULAR, FLOAT,    motor8,            8)
 #define motorCommand_CALLBACK NULL
 #define motorCommand_DEFAULT NULL
 
+#define AccelData_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, FLOAT,    x,                 1) \
+X(a, STATIC,   SINGULAR, FLOAT,    y,                 2) \
+X(a, STATIC,   SINGULAR, FLOAT,    z,                 3)
+#define AccelData_CALLBACK NULL
+#define AccelData_DEFAULT NULL
+
+#define sensorData_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   id,                1) \
+X(a, STATIC,   ONEOF,    FLOAT,    (data,temperature,data.temperature),   2) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (data,accel,data.accel),   3) \
+X(a, STATIC,   ONEOF,    FLOAT,    (data,amperage,data.amperage),   4)
+#define sensorData_CALLBACK NULL
+#define sensorData_DEFAULT NULL
+#define sensorData_data_accel_MSGTYPE AccelData
+
 #define MyMessage_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, INT32,    id,                1) \
 X(a, STATIC,   SINGULAR, STRING,   content,           2)
@@ -130,17 +175,21 @@ X(a, STATIC,   SINGULAR, STRING,   content,           2)
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,status,payload.status),   1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,pos,payload.pos),   2) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,debug,payload.debug),   3) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (payload,motor_msg,payload.motor_msg),   4)
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,motor_msg,payload.motor_msg),   4) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,readings,payload.readings),   5)
 #define Envelope_CALLBACK NULL
 #define Envelope_DEFAULT NULL
 #define Envelope_payload_status_MSGTYPE operationStatus
 #define Envelope_payload_pos_MSGTYPE positionCommand
 #define Envelope_payload_debug_MSGTYPE MyMessage
 #define Envelope_payload_motor_msg_MSGTYPE motorCommand
+#define Envelope_payload_readings_MSGTYPE sensorData
 
 extern const pb_msgdesc_t operationStatus_msg;
 extern const pb_msgdesc_t positionCommand_msg;
 extern const pb_msgdesc_t motorCommand_msg;
+extern const pb_msgdesc_t AccelData_msg;
+extern const pb_msgdesc_t sensorData_msg;
 extern const pb_msgdesc_t MyMessage_msg;
 extern const pb_msgdesc_t Envelope_msg;
 
@@ -148,16 +197,20 @@ extern const pb_msgdesc_t Envelope_msg;
 #define operationStatus_fields &operationStatus_msg
 #define positionCommand_fields &positionCommand_msg
 #define motorCommand_fields &motorCommand_msg
+#define AccelData_fields &AccelData_msg
+#define sensorData_fields &sensorData_msg
 #define MyMessage_fields &MyMessage_msg
 #define Envelope_fields &Envelope_msg
 
 /* Maximum encoded size of messages (where known) */
+#define AccelData_size                           15
 #define Envelope_size                            78
 #define MESSAGE_PB_H_MAX_SIZE                    Envelope_size
 #define MyMessage_size                           76
 #define motorCommand_size                        40
 #define operationStatus_size                     4
 #define positionCommand_size                     36
+#define sensorData_size                          23
 
 #ifdef __cplusplus
 } /* extern "C" */
