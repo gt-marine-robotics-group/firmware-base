@@ -19,6 +19,8 @@
 #include <107-Arduino-Servo-RP2040.h>
 #include "config.h"
 
+using namespace _107_;
+
 /**
  * @brief Controls the physical H-Bridge hardware.
  * * This class manages PWM generation and direction pins. It is only
@@ -76,15 +78,15 @@ class MotorController{
         static constexpr int ADC_CENTER = 512;      ///< The middle value of the ADC for flipping direction
         static constexpr int PWM_MAX    = 255;      ///< Max value of a PWM, low-key this should be a global constant but idk where to put this
         static constexpr int DEADBAND   = 50;       ///< Don't operate the motor at too low of a PWM, adjust to remove jitter
-
-        static _107_::Servo motor1;
-        static _107_::Servo motor2;
-        static _107_::Servo motor3;
-        static _107_::Servo motor4;
-        static _107_::Servo motor5;
-        static _107_::Servo motor6;
-        static _107_::Servo motor7;
-        static _107_::Servo motor8;
+        
+        Servo motor1;
+        Servo motor2;
+        Servo motor3;
+        Servo motor4;
+        Servo motor5;
+        Servo motor6;
+        Servo motor7;
+        Servo motor8;
 };
 
 #endif

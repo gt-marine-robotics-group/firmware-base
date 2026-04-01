@@ -19,14 +19,6 @@
 
 #include "MotorController.h"
 
-_107_::Servo MotorController::motor1;
-_107_::Servo MotorController::motor2;
-_107_::Servo MotorController::motor3;
-_107_::Servo MotorController::motor4;
-_107_::Servo MotorController::motor5;
-_107_::Servo MotorController::motor6;
-_107_::Servo MotorController::motor7;
-_107_::Servo MotorController::motor8;
 
 // Constructor
 MotorController::MotorController() {
