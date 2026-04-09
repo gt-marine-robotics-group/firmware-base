@@ -35,6 +35,10 @@ typedef struct _motorCommand {
     float motor8;
 } motorCommand;
 
+typedef struct _dropperCommand {
+    uint32_t dropper;
+} dropperCommand;
+
 typedef struct _AccelData {
     float x;
     float y;
@@ -64,6 +68,7 @@ typedef struct _Envelope {
         MyMessage debug;
         motorCommand motor_msg;
         sensorData readings;
+        dropperCommand dropper;
     } payload;
 } Envelope;
 
@@ -76,6 +81,7 @@ extern "C" {
 #define operationStatus_init_default             {0, 0}
 #define positionCommand_init_default             {0, 0, 0, 0, 0, 0}
 #define motorCommand_init_default                {0, 0, 0, 0, 0, 0, 0, 0}
+#define dropperCommand_init_default              {0}
 #define AccelData_init_default                   {0, 0, 0}
 #define sensorData_init_default                  {0, 0, {0}}
 #define MyMessage_init_default                   {0, ""}
@@ -83,6 +89,7 @@ extern "C" {
 #define operationStatus_init_zero                {0, 0}
 #define positionCommand_init_zero                {0, 0, 0, 0, 0, 0}
 #define motorCommand_init_zero                   {0, 0, 0, 0, 0, 0, 0, 0}
+#define dropperCommand_init_zero                 {0}
 #define AccelData_init_zero                      {0, 0, 0}
 #define sensorData_init_zero                     {0, 0, {0}}
 #define MyMessage_init_zero                      {0, ""}
@@ -105,6 +112,7 @@ extern "C" {
 #define motorCommand_motor6_tag                  6
 #define motorCommand_motor7_tag                  7
 #define motorCommand_motor8_tag                  8
+#define dropperCommand_dropper_tag               1
 #define AccelData_x_tag                          1
 #define AccelData_y_tag                          2
 #define AccelData_z_tag                          3
@@ -119,6 +127,7 @@ extern "C" {
 #define Envelope_debug_tag                       3
 #define Envelope_motor_msg_tag                   4
 #define Envelope_readings_tag                    5
+#define Envelope_dropper_tag                     6
 
 /* Struct field encoding specification for nanopb */
 #define operationStatus_FIELDLIST(X, a) \
@@ -149,6 +158,11 @@ X(a, STATIC,   SINGULAR, FLOAT,    motor8,            8)
 #define motorCommand_CALLBACK NULL
 #define motorCommand_DEFAULT NULL
 
+#define dropperCommand_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, UINT32,   dropper,           1)
+#define dropperCommand_CALLBACK NULL
+#define dropperCommand_DEFAULT NULL
+
 #define AccelData_FIELDLIST(X, a) \
 X(a, STATIC,   SINGULAR, FLOAT,    x,                 1) \
 X(a, STATIC,   SINGULAR, FLOAT,    y,                 2) \
@@ -176,7 +190,8 @@ X(a, STATIC,   ONEOF,    MESSAGE,  (payload,status,payload.status),   1) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,pos,payload.pos),   2) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,debug,payload.debug),   3) \
 X(a, STATIC,   ONEOF,    MESSAGE,  (payload,motor_msg,payload.motor_msg),   4) \
-X(a, STATIC,   ONEOF,    MESSAGE,  (payload,readings,payload.readings),   5)
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,readings,payload.readings),   5) \
+X(a, STATIC,   ONEOF,    MESSAGE,  (payload,dropper,payload.dropper),   6)
 #define Envelope_CALLBACK NULL
 #define Envelope_DEFAULT NULL
 #define Envelope_payload_status_MSGTYPE operationStatus
@@ -184,10 +199,12 @@ X(a, STATIC,   ONEOF,    MESSAGE,  (payload,readings,payload.readings),   5)
 #define Envelope_payload_debug_MSGTYPE MyMessage
 #define Envelope_payload_motor_msg_MSGTYPE motorCommand
 #define Envelope_payload_readings_MSGTYPE sensorData
+#define Envelope_payload_dropper_MSGTYPE dropperCommand
 
 extern const pb_msgdesc_t operationStatus_msg;
 extern const pb_msgdesc_t positionCommand_msg;
 extern const pb_msgdesc_t motorCommand_msg;
+extern const pb_msgdesc_t dropperCommand_msg;
 extern const pb_msgdesc_t AccelData_msg;
 extern const pb_msgdesc_t sensorData_msg;
 extern const pb_msgdesc_t MyMessage_msg;
@@ -197,6 +214,7 @@ extern const pb_msgdesc_t Envelope_msg;
 #define operationStatus_fields &operationStatus_msg
 #define positionCommand_fields &positionCommand_msg
 #define motorCommand_fields &motorCommand_msg
+#define dropperCommand_fields &dropperCommand_msg
 #define AccelData_fields &AccelData_msg
 #define sensorData_fields &sensorData_msg
 #define MyMessage_fields &MyMessage_msg
@@ -207,6 +225,7 @@ extern const pb_msgdesc_t Envelope_msg;
 #define Envelope_size                            78
 #define MESSAGE_PB_H_MAX_SIZE                    Envelope_size
 #define MyMessage_size                           76
+#define dropperCommand_size                      6
 #define motorCommand_size                        40
 #define operationStatus_size                     4
 #define positionCommand_size                     36

@@ -25,6 +25,7 @@ ProtoReceiver::ProtoReceiver() {
 // Initialize the list globally
 int32_t ProtoReceiver::global_position[6] = {0, 0, 0, 0, 0, 0};
 uint32_t ProtoReceiver::motor_commands[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t ProtoReceiver::dropper_command = 0;
 bool ProtoReceiver::manual_mode = false;
 
 bool ProtoReceiver::newMessage = false;
@@ -63,6 +64,10 @@ void ProtoReceiver::onPacketReceived(const uint8_t* buffer, size_t size) {
             manual_mode = env.payload.status.manual;
             newMessage = true;
             // Serial.println("Motors updated!");
+        }
+        if (env.which_payload == Envelope_dropper_tag) {
+            dropper_command = env.payload.dropper.dropper;
+            newMessage = true;
         }
     }
 }

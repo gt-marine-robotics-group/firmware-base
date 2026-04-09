@@ -15,6 +15,9 @@ PB_BIND(positionCommand, positionCommand, AUTO)
 PB_BIND(motorCommand, motorCommand, AUTO)
 
 
+PB_BIND(dropperCommand, dropperCommand, AUTO)
+
+
 PB_BIND(AccelData, AccelData, AUTO)
 
 

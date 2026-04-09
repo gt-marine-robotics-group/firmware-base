@@ -37,6 +37,10 @@ message motorCommand {
     float motor8 = 8;      
 }
 
+message dropperCommand {
+    uint32 dropper = 1;
+}
+
 message AccelData {
     float x = 1;
     float y = 2;
@@ -64,5 +68,6 @@ message Envelope {
         MyMessage debug = 3;
         motorCommand motor_msg = 4;
         sensorData readings = 5;
+        dropperCommand dropper = 6;
     }
 }

@@ -25,6 +25,7 @@
 #include "LEDMux.h"
 #include "Estop.h"
 #include "MotorController.h"
+#include "Dropper.h"
 
 
 /**
@@ -56,6 +57,7 @@ public:
         if (motorController.setup()){
             // seq = 0b0110;
         }
+        dropper.setup();
         // ledMux.updateLEDSequence(seq);
         // pinMode(16, INPUT_PULLDOWN);
         last_message = millis();
@@ -71,6 +73,7 @@ public:
         if (Estop::estopTriggered) {
             motorController.estop();
             protoSender.sendStatus(true, false); 
+            dropper.estop();
             // uint32_t estopped = (0b1000);
             // ledMux.updateLEDSequence(estopped);
         } else {
@@ -86,6 +89,7 @@ public:
                 // uint32_t message = (0b010);
                 // ledMux.updateLEDSequence(message);
                 motorController.spinMotors(ProtoReceiver::motor_commands);
+                dropper.spinMotor(ProtoReceiver::dropper_command);
                 // delay(1000);
                 
                 // uint32_t seq = (0b0100);
@@ -110,6 +114,7 @@ private:
     ProtoReceiver protoReceiver;
     MotorController motorController;
     Estop estop;
+    Dropper dropper;
     // LEDMux ledMux;
 
     unsigned long last_message;
