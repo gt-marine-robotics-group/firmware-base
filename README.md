@@ -40,14 +40,14 @@ This Raspberry Pi Pico Project is a proof-of-concept using SparkFun parts, where
   - NeoPixel RGB LED
 
 Current assignments for Active MRG Firmware/Embedded Projects:
-- Sensing Board Firmware: Shin + Erin
-- Motor Controller Rewrite: Mahika
+- Sensing Board Firmware: Shin
+- Pico Probe Protobuf integration (virtual COM port): Mahika
 - Advanced Controller (Servo PIO State machine): Mahika, Liam + Jason
 - Bidirectional D-Shot (even more advanced replacement): George
 - Torpedo Embedded: Liam + Jason
 - Torpedo Embedded CV: Peyton
-- Architecture + Inheritance (Sensors): Ariana + Jason
-- Current Sensing Board Stuff (waiting for electrical): Jason
+- Dropper: Ariana + Jason
+- Current Sensing Board Stuff: Jason
 - NeoPixel for RoboSub: Thalia
 - Anything ROS-related: just ask Mitchell lol
 - SPI/RTOS: Someone on RoboBoat
@@ -75,10 +75,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 
 - **Torpedo - INTERMEDIATE**  
   Not included in this firmware base but just for record-keeping
-  
-- **Switch to Hardware PWM Controller for Motor operation due to Servo.h not being good**
-  Current Servo.h library uses PIO State machines to work. There are only 8, which are too few for our purposes and also justa waste of PIO. Switch to hardware-based PWM library like this one:
-  [Hardware Based Arduino Servo Library](https://github.com/107-systems/107-Arduino-Servo-RP2040)
 
  ### Framework & Architecture Design
  This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
@@ -211,6 +207,13 @@ This is essentially stretch goals or developing new features. Our basic framewor
 - **Debugging capabilities - INTERMEDIATE/ADVANCED**  
   Edit from 2/8: Due to Protobuf dominating the Serial connection, would be very nice to have because debug print statements don't work. Am currently debugging through the Protobuf receiver like a debug UART.
   Look into picoprobe. Also seems pretty straightforward since there are plenty of examples.
+
+18. **Switched Motor Controller**  
+   Default servo library was tied to the number of PIO state machines, which is both a waste, and also means that we are limited to 8. Switched to a library that uses the PWM controller so we can have more servos for dropper purposes.
+
+- **Switch to Hardware PWM Controller for Motor operation due to Servo.h not being good**
+  Current Servo.h library uses PIO State machines to work. There are only 8, which are too few for our purposes and also justa waste of PIO. Switch to hardware-based PWM library like this one:
+  [Hardware Based Arduino Servo Library](https://github.com/107-systems/107-Arduino-Servo-RP2040) 
   
 ## Graveyard  
 This section is for interesting ideas that realistically will not happen. If you're super cool and wanna be a necromancer or whatever, I would consider trying these out because these are very interesting project ideas that will strengthen your understanding of firmware and using the Pi Pico, and could also be a flex with resume or career fair discussion. Just this career fair, I spent 40 minutes talking about some of the fancy PIO stuff I'm trying, so this could help you too.
