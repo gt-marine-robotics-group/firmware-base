@@ -7,6 +7,7 @@
  * @version 1.0
  *
  * @brief Header (and implementation) for Presto Jr board.
+ * Testing purposes for Thalia's board.
  *
  * This file controls the logical flow of the board and the 
  * instantiation and function calls of different modules.

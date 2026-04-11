@@ -6,7 +6,9 @@
  * @date 1/17/2025
  * @version 1.0
  *
- * @brief Header (and implementation) for Presto Jr board.
+ * @brief Header (and implementation) for Proto communication board.
+ * Also acts RoboBoat's main board for the 2026 season, but is designed 
+ * to be modular and reusable for future seasons.
  *
  * This file controls the logical flow of the board and the 
  * instantiation and function calls of different modules.
