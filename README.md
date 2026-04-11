@@ -61,10 +61,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
 
 - **SPI Sensor - BEGINNER - OPTIONAL**  
   The advanced goal is to make a fancier SPI communication interface using PIO. This one is just set up an SPI sensor and is pretty easy, but I don't actually have an SPI sensor with me during break. Should take like 10 minutes to set up since there are plenty of examples, and I also have reference code from ECE4180 if needed. If I'm being honest, I'm not sure if we have any SPI sensors, but it's good to keep in our back pocket.
-  
-- **Make this work for our firmware - INTERMEDIATE**  
-  This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
-  See Notion page below for list of tasks.
 
 - **Sensing Board - INTERMEDIATE**  
   Erin Beazley will be taking point on this, but follow the example under lib/BoardDemos to make this work for our specific sensors.
@@ -79,9 +75,6 @@ This codebase is only a proof-of-concept, we need to actually do the annoying pa
  ### Framework & Architecture Design
  This framework is a rough draft, there are plenty of opportunities to improve it. Most improvements are either conceptual design choices or improving the robustness of our framework.
  #### Roadmap: <br> Higher-level decision-making and planning (assign tasks) (1-2 weeks) <br> INTERMEDIATE needs significant progress by start of March (2 months) <br> ADVANCED is for funsies and food for thought (don't care, but prob semester) <br>
- 
-- **Better Comments/Documentation - BEGINNER - OPTIONAL**  
-  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
 
 - **Draw the line between modularity and centralization - BEGINNER**  
   Decide if we want to use config.h as a central controller for all hardware constants (like clocking rates for peripherals or colors for LED interface), or if we want to use config.h as a pinout.h (and maybe set a few flags) and encapsulate the hardware constants in their specific modules, with the specific tweaking being done through flags in config.h. Both are implemented in the code, it's just a decision on personal preference.
@@ -213,7 +206,22 @@ This is essentially stretch goals or developing new features. Our basic framewor
 
 - **Switch to Hardware PWM Controller for Motor operation due to Servo.h not being good**
   Current Servo.h library uses PIO State machines to work. There are only 8, which are too few for our purposes and also justa waste of PIO. Switch to hardware-based PWM library like this one:
-  [Hardware Based Arduino Servo Library](https://github.com/107-systems/107-Arduino-Servo-RP2040) 
+  [Hardware Based Arduino Servo Library](https://github.com/107-systems/107-Arduino-Servo-RP2040)
+
+19. **Dropper Added**
+After switching out Servo library, we were able to add a 9th servo that controls RoboSub's dropper. Yay!
+
+21. **All necessary firmware done :) :D XD**   
+Should be pretty obvious, but basically this bullet point:
+- **Make this work for our firmware - INTERMEDIATE**  
+  This is just a general base to build off of when developing our framework/architecture, so we need to actually make this work for our boards. (duh!)
+  See Notion page below for list of tasks.
+
+22. **Documentation up-to-date**  
+    Basically this bullet point:  
+- **Better Comments/Documentation - BEGINNER - OPTIONAL**  
+  Mostly cleaned up by the Doxygen documentation, but can always be better, especially regarding the logical implementation. Good opportunity for someone to learn how the codebase works.
+
   
 ## Graveyard  
 This section is for interesting ideas that realistically will not happen. If you're super cool and wanna be a necromancer or whatever, I would consider trying these out because these are very interesting project ideas that will strengthen your understanding of firmware and using the Pi Pico, and could also be a flex with resume or career fair discussion. Just this career fair, I spent 40 minutes talking about some of the fancy PIO stuff I'm trying, so this could help you too.
