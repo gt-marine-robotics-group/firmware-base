@@ -15,37 +15,40 @@ lib/
 │   └── PrestoBoard.h
 │   └── PrestoJrBoard.h
 │   └── SensorBoard.h  
+|
+├── Boards_Demo
+|   └── PrestoBoard.h
+|   └── SensorBoard.h
+|   └── SensorRTOSTemplateBoard.h
+|   └── SensorTemplateBoard.h
 │  
 ├── Estop/  
 │   └── Estop.h  
-│   └── LeakSensor.h (planned)  
+|   └── KillSwitch.h
+│   └── LeakSensor.h
 │   └── WatchdogEstop.h (planned)
-│   └── InternalEstop.h (planned)
 │  
 ├── LEDMux/  
-│   ├── led_mux.pio  
-│   ├── led_mux.pio.h  
-│   ├── LEDMux.cpp  
+│   └── LEDMux.cpp  
 │   └── LEDMux.h  
 │  
-├── MotorControl/  
-│   ├── MotorController.cpp  
+├── MotorControl/ 
+|   └── Dropper.cpp
+|   └── Dropper.h
+│   └── MotorController.cpp  
 │   └── MotorController.h  
 |
 ├── NeoPixel/  
-│   ├── StatusLight.h  
+│   └── StatusLight.h  
 |
 ├── PIO/  
 │   └── (PIO assembly scripts)  
-├── PIOExamples/  
-│   └── (example PIO code and experiments)    
+|   └── blink_input.pio
+|   └── led_mux.pio  
 ├── PIOFiles/  
 │   └── (Wrapper .c and .h files for PIO usage) 
 ├── PIOInterfaces/  
 │   └── (our PIO interfaces for SPI, DMA, and/or I2C) - deprecated
-│  
-├── Proto/  
-│   └── (Protobuf message definitions) 
 ├── ProtoFiles/  
 │   └── (Protobuf message packers and senders) 
 ├── ProtoHandlers/  
@@ -58,6 +61,9 @@ lib/
 │   ├── DOFStick.h  
 │   ├── TempSensor.cpp  
 │   └── TempSensor.h  
+|
+├── Templates/
+|   └── Sensor.h
 │  
 ├── VariableBlink/  
 │   ├── blink_input.pio  
@@ -129,7 +135,7 @@ Store the raw PIO Assembly scripts here
 
 ### PIOExamples
 These are examples pulled from the internet to test, so basically a collection of experimental and reference implementations for developers to use as a sandbox. 
-
+ 
 ### PIOFiles
 Generated PIO Wrapper files are stored here. These are the .c and .h files that enable us to interact with the PIO state machines.
 
