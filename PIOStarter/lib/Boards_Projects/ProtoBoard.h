@@ -29,7 +29,7 @@
 
 /**
  * @brief 
- * Acts as centralized logical flow for the PrestoJrBoard specifically.
+ * Acts as centralized logical flow for the ProtoBoard specifically.
  * This class is where we actually implement logic and use our modules. 
  * @note Is the equivalent of the main.cpp in most applications, but is abstracted for modularity 
  * and customizability.

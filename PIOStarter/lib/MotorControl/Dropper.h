@@ -22,9 +22,9 @@
 using namespace _107_;
 
 /**
- * @brief Controls the physical H-Bridge hardware.
+ * @brief Controls the physical dropper.
  * * This class manages PWM generation and direction pins. It is only
- * compiled if the HAS_MOTORS flag is defined in the build environment.
+ * compiled if the HAS_DROPPER flag is defined in the build environment.
  */
 class Dropper{
     public:

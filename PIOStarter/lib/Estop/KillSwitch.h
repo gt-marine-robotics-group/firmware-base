@@ -6,7 +6,9 @@
  * @date 12/24/2025
  * @version 1.0
  *
- * @brief Header (and implementation) for E-Stop.
+ * @brief Header (and implementation) for Kill Switch.
+ * Difference from EStop is that this will not reset without a power cycle, 
+ * and is meant for testing purposes.
  *
  * Implementation is just initializing and handling an Interrupt
  * @see config.h for the hardware definitions like GPIO mapping
@@ -20,11 +22,11 @@
 
 /**
  * @brief 
- * This class is the module that represents the E-stop subsystem.
- * @note Only compiled if the HAS_ESTOP flag is defined in the build environment.
+ * This class is the module that represents the Kill Switch subsystem.
+ * @note Only compiled if the HAS_KILLSWITCH flag is defined in the build environment.
  * @note If internal signal, just output to a pin tied to interrupt pin or manually throw flag.
- * @todo This E-Stop is tied to a GPIO pin since that's the easiest way to do it
- * in Arduino and would read a physical E-Stop switch, the next goals are implementing 
+ * @todo This Kill Switch is tied to a GPIO pin since that's the easiest way to do it
+ * in Arduino and would read a physical Kill Switch switch, the next goals are implementing 
  * a watchdog timer for lost connection, and the ultimate goal is register-level interrupt.
  * You can rip the RC/ROS E-stop reading code from the old firmware then.
  */

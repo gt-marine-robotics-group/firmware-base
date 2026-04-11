@@ -22,7 +22,7 @@
 using namespace _107_;
 
 /**
- * @brief Controls the physical H-Bridge hardware.
+ * @brief Controls the physical Motor Controller hardware.
  * * This class manages PWM generation and direction pins. It is only
  * compiled if the HAS_MOTORS flag is defined in the build environment.
  */

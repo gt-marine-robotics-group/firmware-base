@@ -6,7 +6,7 @@
  * @date 12/24/2025
  * @version 1.0
  *
- * @brief Header (and implementation) for Sensor board.
+ * @brief Header (and implementation) for Sensor board using RTOS.
  *
  * This file controls the logical flow of the board and the 
  * instantiation and function calls of different modules.
