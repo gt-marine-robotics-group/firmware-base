@@ -17,7 +17,7 @@ from abc import ABC
 #     # Envelope,
 # )
 
-from ROSBridgeStarter.pb.message_pb2 import Envelope, motorCommand
+from ROSBridgeStarter.pb.message_pb2 import Envelope, motorCommand, operationStatus
 
 
 class BaseBridge(ABC):
@@ -159,16 +159,16 @@ class PrestoBridge(BaseBridge):
 
     #     self._send_envelope(env)
 
-    # def read_state_once(self) -> PrestoState | None:
-    #     """Try to read one PrestoState from the wire; return msg or None."""
+    def read_status_once(self) -> operationStatus | None:
+        """Try to read one operationStatus from the wire; return msg or None."""
 
-    #     env = self._read_envelope_once()
-    #     if not env:
-    #         return None
+        env = self._read_envelope_once()
+        if not env:
+            return None
 
-    #     if env.WhichOneof("payload") == "presto_state":  # How we can detect what kind of data is coming in
-    #         return env.presto_state
-    #     return None
+        if env.WhichOneof("payload") == "status":  # How we can detect what kind of data is coming in
+            return env.status
+        return None
 
 # class SensorBoardBridge(BaseBridge):
     

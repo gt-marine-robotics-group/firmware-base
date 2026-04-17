@@ -53,23 +53,23 @@ class RosBridge(Node):
         # self._last_led_color = None
 
         # ------ ROS Publishers ------
-        # self.estop_pub = self.create_publisher(
-        #     Bool,
-        #     "/pontus/e_stop",
-        #     10
-        # )
+        self.estop_pub = self.create_publisher(
+            Bool,
+            "/pontus/e_stop",
+            10
+        )
 
-        # self.autonomy_switch_pub = self.create_publisher(
-        #     Bool,
-        #     "/pontus/autonomy_switch",
-        #     10
-        # )
+        self.autonomy_switch_pub = self.create_publisher(
+            Bool,
+            "/pontus/autonomy_switch",
+            10
+        )
 
         # ------ Timers ------
-        # self.telemetry_timer = self.create_timer(
-        #     1.0 / telemtry_hz,
-        #     self._telemetry_timer_callback
-        # )
+        self.telemetry_timer = self.create_timer(
+            1.0 / telemtry_hz,
+            self._telemetry_timer_callback
+        )
 
     # --------- Callbacks ---------
 
@@ -100,34 +100,34 @@ class RosBridge(Node):
     #                 f"send_indicator_led_command failed: {e}"
     #             )
 
-    # def _telemetry_timer_callback(self) -> None:
-    #     # ------ Presto Board Telemetry ------
-    #     if self.presto_bridge and self.presto_bridge._connected:
-    #         state = self.presto_bridge.read_state_once()
-    #         if state:
-    #             e_stop_msg = Bool()
-    #             e_stop_msg.data = bool(state.e_stop)
-    #             self.estop_pub.publish(e_stop_msg)
+    def _telemetry_timer_callback(self) -> None:
+        # ------ Presto Board Telemetry ------
+        if self.presto_bridge and self.presto_bridge._connected:
+            state = self.presto_bridge.read_status_once()
+            if state:
+                e_stop_msg = Bool()
+                e_stop_msg.data = bool(state.estop)
+                self.estop_pub.publish(e_stop_msg)
 
-    #             autonomy_switch_msg = Bool()
-    #             autonomy_switch_msg.data = bool(state.autonomy_switch)
-    #             self.autonomy_switch_pub.publish(autonomy_switch_msg)
+                autonomy_switch_msg = Bool()
+                autonomy_switch_msg.data = bool(state.manual)
+                self.autonomy_switch_pub.publish(autonomy_switch_msg)
 
-    #     # ------ Sensor Board Telemetry ------
-    #     if self.sensorb_bridge and self.sensorb_bridge._connected:
-    #         state = self.sensorb_driver.read_state_once()
-    #         if state:
-    #             depth_msg = Float32()
-    #             depth_msg.data = state.pressure_pa
-    #             self.depth_sensor_pub.publish(depth_msg)
+        # ------ Sensor Board Telemetry ------
+        # if self.sensorb_bridge and self.sensorb_bridge._connected:
+        #     state = self.sensorb_driver.read_state_once()
+        #     if state:
+        #         depth_msg = Float32()
+        #         depth_msg.data = state.pressure_pa
+        #         self.depth_sensor_pub.publish(depth_msg)
 
-    #             voltage_msg = Float32()
-    #             voltage_msg.data = state.voltage_v
-    #             self.voltage_pub.publish(voltage_msg)
+        #         voltage_msg = Float32()
+        #         voltage_msg.data = state.voltage_v
+        #         self.voltage_pub.publish(voltage_msg)
 
-    #             current_msg = Float32()
-    #             current_msg.data = state.current_a
-    #             self.current_pub.publish(current_msg)
+        #         current_msg = Float32()
+        #         current_msg.data = state.current_a
+        #         self.current_pub.publish(current_msg)
 
 # ------ Main ------
 def main(args: Optional[list[str]] = None) -> None:
