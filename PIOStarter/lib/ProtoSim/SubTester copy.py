@@ -40,7 +40,6 @@ dropper_map = {0: "NEUTRAL", 1: "OPEN", 2: "CLOSE"}
 step_mode = "FINE"
 current_step = 0.05
 
-# Integrated operationStatus state
 pico_status = {"estop": False, "manual": False, "debug": "No messages yet", "debug_id": 0}
 sensors = {"temp": 0.0, "amp": 0.0, "accel": {"x": 0.0, "y": 0.0, "z": 0.0}}
 
@@ -52,6 +51,7 @@ def clamp_and_round(val):
 
 # --- 3. Communication Logic ---
 def send_payload(payload_type, data):
+    """Unified sender for Motor and Dropper commands."""
     global last_send_time, active_motors
     envelope = message_pb2.Envelope()
     
@@ -95,8 +95,7 @@ def listener():
                         env.ParseFromString(decoded)
                         ptype = env.WhichOneof("payload")
                         if ptype == "status":
-                            pico_status["estop"] = env.status.estop
-                            pico_status["manual"] = env.status.manual
+                            pico_status["estop"], pico_status["manual"] = env.status.estop, env.status.manual
                         elif ptype == "debug":
                             pico_status["debug_id"], pico_status["debug"] = env.debug.id, env.debug.content
                         elif ptype == "readings":
@@ -139,7 +138,7 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
                 val_color = term.yellow_bold if abs(motors[i] - active_motors[i]) > 0.001 else term.bold
                 print(f"{prefix}{motor_label}: [{term.green}{''.join(bar)}{term.normal}] {val_color}{motors[i]:.2f}{term.normal}      ")
 
-        # Telemetry & Status Indicators (Right)
+        # Telemetry (Right)
         with term.location(60, 4):
             print(term.bold + "SENSOR TELEMETRY" + term.normal)
             print(term.move_x(60) + f"Temp: {term.yellow}{sensors['temp']:.1f}°C{term.normal}   ")
@@ -147,20 +146,16 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             print(term.move_x(60) + f"Accel X: {sensors['accel']['x']:.2f} g  ")
             print(term.move_x(60) + f"Accel Y: {sensors['accel']['y']:.2f} g  ")
             print(term.move_x(60) + f"Accel Z: {sensors['accel']['z']:.2f} g  ")
-            
-            # Status LEDs
-            estop_led = term.red_reverse + "  ESTOP  " + term.normal if pico_status["estop"] else term.green + "  SAFE   " + term.normal
-            manual_led = term.blue_reverse + "  MANUAL " + term.normal if pico_status["manual"] else term.white + "   AUTO  " + term.normal
-            print(term.move_x(60) + f"\n" + term.move_x(60) + f"STATUS: {estop_led} {manual_led}")
 
         # Footer
         with term.location(0, 14):
             print(term.clear_eol + "-" * term.width)
+            estop_col = term.red_bold if pico_status["estop"] else term.green
             mode_str = term.yellow_reverse + " LIVE " + term.normal if live_mode else "STAGED"
             drop_col = term.magenta_bold if dropper_val != 0 else term.normal
             print(term.clear_eol + f"MODE: {mode_str} | STEP: {step_mode} | DROPPER: {drop_col}{dropper_map[dropper_val]}{term.normal} | GROUP: {group_mode}")
             debug_info = f"[{pico_status['debug_id']}] {pico_status['debug']}"
-            print(term.clear_eol + f"E-Stop: {pico_status['estop']} | LAST DEBUG: {term.yellow}{debug_info}{term.normal}")
+            print(term.clear_eol + f"E-Stop: {estop_col}{pico_status['estop']}{term.normal} | LAST DEBUG: {term.yellow}{debug_info}{term.normal}")
 
         key = term.inkey(timeout=0.02)
         if key.lower() == 'q': break
@@ -176,7 +171,7 @@ with term.fullscreen(), term.cbreak(), term.hidden_cursor():
             send_payload("dropper", dropper_val)
         elif key.name == 'KEY_ENTER': send_payload("motor", motors)
 
-        # Controls and Delta Logic
+        # Controls
         delta = 0
         if key.name == 'KEY_UP': selected_idx = (selected_idx - 1) % 8
         elif key.name == 'KEY_DOWN': selected_idx = (selected_idx + 1) % 8

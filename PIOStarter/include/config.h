@@ -87,4 +87,9 @@ namespace config {
         static constexpr uint8_t LED_PIN = 26;         ///< Sensor I2C SDA pin
         static constexpr uint8_t NUM_LEDS = 1;
     #endif
+
+    #ifdef HAS_AUTONOMY_SWITCH
+        static constexpr uint8_t AUTONOMY_SWITCH_PIN = 10; ///< GPIO for reading autonomy switch state
+    #endif
+
 }

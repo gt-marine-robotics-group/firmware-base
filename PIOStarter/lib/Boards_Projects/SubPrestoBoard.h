@@ -59,7 +59,7 @@ public:
         }
         dropper.setup();
         // ledMux.updateLEDSequence(seq);
-        // pinMode(16, INPUT_PULLDOWN);
+        pinMode(config::AUTONOMY_SWITCH_PIN, INPUT_PULLUP);
         last_message = millis();
         
     }
@@ -82,6 +82,7 @@ public:
             // motorController.sweepMotors(); // Initial Dry Test, comment this out during the actual motor run
 
             protoReceiver.receiveData();
+            protoSender.sendStatus(Estop::estopTriggered, !digitalRead(config::AUTONOMY_SWITCH_PIN)); 
 
             if (ProtoReceiver::newMessage){
                 last_message = millis();
