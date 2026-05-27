@@ -6,7 +6,7 @@ The source code of each library should be placed in a separate directory
 ("lib/your_library_name/[Code]").
 
 Current Project Directory:
-
+````
 lib/  
 ├── AppCore/  
 │   └── AppCore.h  
@@ -73,6 +73,7 @@ lib/
 │  
 ├── README --> THIS FILE  
 └── README copy  (the original PlatformIO REadME)  
+````
 
 # Project Modules 
 This repository is organized into modular components, separating hardware abstractions, core logic, and reference implementations.
