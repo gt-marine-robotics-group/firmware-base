@@ -1,0 +1,696 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{fancyhdr}
+\usepackage[title]{appendix}
+\usepackage{tabularx}
+\usepackage{hhline}
+\usepackage{stfloats}
+\usepackage{hyperref}
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{pgfgantt}
+\usepackage{xcolor}
+\usepackage{lscape}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage[pass]{geometry}
+
+
+\font\myfont=cmr12 at 20pt
+
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+    
+\begin{document}
+\pagestyle{fancy}
+\fancyhf{}                         % Clears both header AND footer fields
+
+\lhead{\footnotesize GEORGIA INSTITUTE OF TECHNOLOGY - MARINE ROBOTICS GROUP}
+\rhead{\footnotesize \thepage}                   % Puts the number in the top right
+\renewcommand{\headrulewidth}{0pt} % Removes the horizontal header line
+\setlength{\headheight}{8pt}
+
+\title{\myfont RoboSub 2026 Technical Design Report} 
+\author{{Erin Beazley, John Beeson, ... }\\
+ Mitchell Turton, Matthew Woodward, Aaron Wu \\
+\IEEEauthorblockA{Marine Robotics Group at Georgia Tech} 
+Atlanta, Georgia \\
+}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+This document is a model and instructions for \LaTeX.
+This and the IEEEtran.cls file define the components of your paper [title, text, heads, etc.]. *CRITICAL: Do Not Use Symbols, Special Characters, Footnotes, 
+or Math in Paper Title or Abstract.
+\end{abstract}
+
+
+\section{Competition Strategy}
+
+\subsection{High-Level Strategy}
+
+The Marine Robotics Group at Georgia Tech's (MRG) strategy for RoboSub 2026 is to increase the intelligence and capabilities of our foundational 2025 platform. In doing so, we prioritize tasks that give the highest return on engineering and testing time. Rather than attempting to add a separate complex mechanism for every task, the team prioritized a strong base system: reliable guidance, navigation, and control, robust perception, a stable modular mechanical platform, and an electrical system that is reliable and safe to operate. The main goal is to complete the core navigation tasks consistently and autonomously. If navigation systems perform reliably, the stretch goal is to use the same autonomy and perception stack to complete the bin task with a dropper subsystem.
+
+This strategy is driven by one of the biggest constraints on the team: limited water test time. A system that can only be tested in the pool is much more costly to develop than a system that can be validated in simulation, using bagged sensor data, or bench testing. For this reason, the team emphasized software and perception work that could be mostly tested outside the water before being brought to full vehicle testing. The mechanical and electrical designs support this same approach by keeping the vehicle modular, easy to access, and quick to repair between tests.
+
+The vehicle design directly supports this competition strategy. The X-drive thruster configuration gives the robot full 6 DOF control for tight maneuverability, necessary for reliable navigation and setting up the ability to do manipulation tasks. The modular mechanical structure allows sensors and mechanisms to be added, removed, or moved without large redesigns. The electrical system was designed around serviceability and safety so that failures can be found quickly without consuming limited pool time.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\linewidth, angle=0]{images/sub_underwater.png}
+\caption{Georgia Tech AUV below the surface}
+\label{TechTritonIMG}
+\end{figure}
+
+\subsection{Task Strategy}
+
+\subsubsection{2025 Capabilities}
+
+The 2025 vehicle established the main foundation for the current competition approach. RoboSub 2025 was the first year competing with our platform, so the scope of development was intentionally limited to essential system capabilities. The team developed a ROS 2 software stack, low-light camera based perception, basic task autonomy, an X-drive vehicle configuration, DVL and IMU based odometry, and simulation support. This development cycle yielded a competition-ready platform with strong navigation ability. Some attention was also given to subsystem development, but subsystem integration was limited by testing time. Reliable, tested performance was prioritized, so subsystem integration was postponed to the 2026 development cycle. 
+
+For 2026, the team is building from the capabilities of the foundational system. The software architecture, perception pipeline, and controller structure are being improved so the AUV can complete a smaller number of tasks more consistently. We evaluate that this is a better use of team effort than adding several isolated mechanisms that each require isolated integration and testing time.
+
+\subsubsection{Extending Vehicle Capabilities}
+
+To improve the 2025 platform, we extend vehicle capabilities for guidance, navigation, and control. The highest priority is completing the navigation sequence: passing through the gate, using course markers to continue through the course, completing slalom navigation, surfacing at the octagon, and returning home. These tasks mostly depend on the same underlying systems, so improvements to perception, localization, and control benefit multiple tasks at once.
+
+The bin task is treated as a stretch goal because it adds a new physical action while still depending on the same core autonomy and perception systems. The dropper mechanism is intentionally simple so that attempting the bin task does not introduce unnecessary mechanical risk. If perception and positioning for the bin task do not show satisfactory performance during competition runs, the robot can still run the navigation-focused strategy without carrying a large amount of unused mechanism complexity.
+
+\subsubsection{Capability-Task Alignment}
+
+The team organized the course around the capabilities required rather than treating each task as a completely separate problem. This helped identify which systems were granted most development effort.
+
+\begin{table}[htbp]
+\caption{Competition task priorities and required capabilities.}
+\label{tab:task_alignment}
+\begin{center}
+\begin{tabularx}{\columnwidth}{|p{0.22\columnwidth}|p{0.20\columnwidth}|X|}
+\hline
+\textbf{Task Area} & \textbf{Priority} & \textbf{Primary Required Capabilities} \\
+\hline
+Gate / Qualification & Highest & Stable depth control, heading control, forward camera perception, waypoint following, and reliable task state transitions. \\
+\hline
+Course Navigation & High & Path marker detection, search behavior, strafing with X-drive, odometry, and fallback logic when detections are lost. \\
+\hline
+Slalom / Obstacle Navigation & High & Object detection, relative positioning, controlled turns, and smooth waypoint generation. \\
+\hline
+Surface / Return Tasks & Medium & Localization consistency, mission state tracking, depth control, and reliable surfacing behavior. \\
+\hline
+Bin / Dropper & Stretch & Downward camera perception, precise station keeping, and a simple two-shot dropper mechanism. \\
+\hline
+\end{tabularx}
+\end{center}
+\end{table}
+
+The team chose to focus on navigation, perception, and controls first because these capabilities support nearly every planned task. In doing so, we align our development effort with the greatest number of scoring tasks while increasing overall performance reliability. In contrast, more specialized mechanisms can only score points in single task arenas and are at risk if GNC is less developed.
+
+\subsubsection{Essential System Changes}
+
+The essential system changes for 2026 focus on achieving reliable and repeatable system performance. On the software side, the autonomy stack is being structured so that each task has clear entry conditions, exit conditions, search behavior, and failure behavior. On the perception side, the team is focusing on collecting better underwater data, improving model performance, and filtering detections before they are used by autonomy. On the controls side, the goal is smooth and predictable waypoint following rather than aggressive maneuvers.
+
+The mechanical and electrical changes follow the same logic. The dropper was chosen because it is simple, small, and does not interfere with the main navigation strategy. The modular frame and electronics access systems reduce the time needed to make changes between tests. The emergency stop and power system changes are intended to make the vehicle safer to operate and less likely to damage expensive components during repeated development cycles.
+
+\subsection{Managing Complexity - Trade Studies (integrate more cleanly)}
+
+The main complexity tradeoff was between building more possible scoring systems and making the most important systems reliable. The team chooses reliability. A partially integrated mechanism can reduce total performance if it makes the vehicle harder to maintain, harder to balance, or harder to debug. For that reason, the team only prioritizes systems that either support several tasks at once or can be tested independently before being added to the robot.
+
+Software complexity is managed by keeping task behavior modular. Each task is written as a separate autonomy behavior with its own parameters, detection requirements, and completion conditions. This makes it possible to tune one task without rewriting the entire run logic. It also allows the team to disable a task or swap to a simpler behavior if testing shows that a more complex version is not ready.*
+
+Testing complexity is managed by moving as much validation as possible out of the pool. Simulation is used to test task logic, search patterns, and controller behavior before a pool test. Dry tests are used to verify electrical safety, sensor communication, firmware communication, and emergency stop behavior. Pool time is then reserved for the parts that cannot be fully proven on land: waterproofing, vehicle dynamics, underwater perception, and full mission integration.
+
+Overall, the competition strategy is to score points through a smaller number of consistent autonomous behaviors rather than relying on many fragile systems. We prioritize a vehicle that completes the core course reliably instead of a vehicle with more theoretical scoring potential but less integration confidence.
+
+\section{Design Strategy}
+
+\textcolor{blue}{
+For now fill out the technical area sections separately to get the content we wish to discuss and we will consolidate on the second draft
+}
+
+\subsection{Hardware}
+
+\subsubsection{Platform Overview}
+The main body of the robot is comprised of a central 24-inch acrylic tube containing its electrical systems, four aluminum plates, and eight thinner acrylic guide rods. All systems are mounted on acrylic guide rails between the aluminum plates that allow for modularity, ease of installation, and the ability to swap system locations on the robot. This creative solution to system mounting provides flexibility that is a valuable asset in testing.
+
+The core design of the robot is symmetrical, simplifying the weight balancing process. The robot’s center of gravity and center of buoyancy are centered in the front-back direction and side-side direction. The center of buoyancy is above the center of gravity to provide roll and pitch stability, making the robot easier to control in water and supporting our goal of reliable system control. 
+
+The robot has eight thrusters: four vertical thrusters for increasing or decreasing depth and pitching or rolling, and four horizontal thrusters for moving forward and backward, yawing, or strafing. For maneuverability, the robot’s four horizontal thrusters are in an X-drive configuration, allowing for lateral movement in addition to forward movement. The X-drive configuration provides six degrees of freedom and improved position control, minimizing task completion time. 
+
+Most attachments and systems are 3D printed in PETG for its enhanced chemical resistance over PLA. To reduce weight on land while still minimizing excessive positive buoyancy in water, all 3D printed mounts are designed to quickly absorb and drain water. This is accomplished through printing all parts with a low infill density and using a gyroid infill pattern. Gyroid infill creates a single continuous volume on the inside. By adding drilled holes to the sides of the parts in specific locations at the top and bottom of pockets of air, the 3D printed mounts fill with water quickly and effectively reduce positive buoyancy. 
+
+The robot features two battery tubes, each containing two LiPo batteries. They are connected by removable cables to the back cover of the sub. Betteries can be replaced without unsealing the main body, minimizing unwanted wire disconnection or compromised seal. The air-filled battery tubes are placed at the top of the sub to raise the platform's center of buoyancy and increase system stability.
+
+The internal electronics inside the main enclosure are all mounted to a set of drawer slides. This allows for easy access to the electronics without removing all electronics from the sub. The drawer slides’ mounting points prevent the drawer from rolling inside the cylinder when the sub rolls, providing all the benefits of an easily-removable electronics enclosure without the downside of it being susceptible to movement within the cylinder if the sub rolls. 
+
+\subsubsection{Dropper Subsystem}
+The dropper mechanism is composed of a 3D printed two-chamber release system powered by a BlueTrail waterproof servo. Its base mounts to the set of guide rods below the robot and has two slots to place the projectiles into. The servo controls a 3D printed triangular door. In its initial position, both slots are covered. Moving to the side, it first uncovers one slot, allowing one projectile to descend. In this way, it can separately drop both projectiles using the same simple mechanism. By minimizing the number of moving parts, the dropper system is less likely to fail or work incorrectly. 
+
+The dropper projectile has a circular cross section along its main body. It is primarily cylindrical with a partially rounded front. At the back, its circular cross section linearly decreases to a point while four fins that stick radially outward with the same radius as the primarily circular cross section protrude. These fins are designed to ensure a straight descent. The dropper projectile filled with metal shot to make it sufficiently negatively buoyant. The projectile’s hydrodynamic front and fins and highly negative buoyancy produce a reliable straight descent. Other projectile designs were tested with this design being the most reliable.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.35\textwidth, angle=0]{images/dropper.png}
+\caption{Dropper assembly with falling projectile.}
+\label{TechTritonIMG}
+\end{figure}
+
+\subsubsection{Power Systems}
+The complete vehicle power system is composed of two common-ground circuits: the thruster and computational power systems. The thruster power system includes the thruster power supply, emergency stopping device, voltage regulation Printed Circuit Boards (PCBs), fuses, motors, and electronic speed controllers (ESCs). The computation power system includes computational power supply, a Jetson Orrin Nano AI Edge Computing Device, embedded microcontrollers, and sensors for perception and localization. Each system is powered by 2 4s LiPo batteries contained in external battery enclosures. These systems are separated because the thruster power system draws variable current depending on vehicle behavior and consequently has unstable voltage levels. Voltage-sensitive and high-cost electronics are contained within the computational power system to protect them from the harsher conditions present in the thruster power system. The partitioning of the two systems effectively protects delicate electronics while conceptually differentiating the roles of each system.
+
+\subsubsection{Electrical System Organization}
+To increase system stability and ease of maintenance, the electrical system layout and power harness were majorly reconfigured. The primary revisions were to the thruster power system power harness and to the interface between the backplate and electronics drawer.
+
+The 2025 thruster power harness was completely removed from the system. A new 200 A automotive switching relay was selected in place of the four legacy relays to decrease component footprint and harness complexity. Low gauge wire was selected for the harness to replace degraded legacy wire and provide additional margin in high-current operating conditions. The wire gauge was calculated based on the maximum possible current draw for the thruster power system, though such extremes are not encountered under normal operating conditions.
+
+To reduce harness complexity and improve system safety and monitoring, power is distributed through three small power distribution PCBs. Each PCB contains fuses for each ESC, an LED power indicator, and board-mounted power connectors. Each PCB supplies power to two to three ESCs, which provide motor commands. The revision decreased the number of wires extending from the relay block by 81\%. Terminal rings were used instead of brittle solder joints to connect large bodies, increasing system longevity. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.35\textwidth, angle=0]{images/backplate_organizer_here.jpg}
+\caption{\textcolor{red}{PLEASE PUT THE BACKPLATE ORGANIZER CLEAN CAD HERE THANK YOU!}}
+\label{TechTritonIMG}
+\end{figure}
+
+Additionally, care was taken to revise the interface between the backplate and electronics drawer. In 2025, these connections posed maintenance challenges and stability concerns. In 2026, an acrylic mounting panel was introduced to fix harness components in place, provide constant labeled connection points, increase ease of maintenance, and provide a more orderly interior flow. Cable lengths within the electronics drawer behind the cable organizer are fixed in length and position, which reduces the risk of system damage when the enclosure is opened. Wire slack is contained between the backplate and acrylic organizer. The acrylic plate contains panel mount connections between the backplate and interior drawer, which provides and appropriate place to easily disconnect and reconnect components. These revisions are in alignment with our competition strategy goal to improve the safety and reliability of the electrical power system.
+
+\subsubsection{Emergency Stopping}
+An emergency stop is included within the thruster power system that terminates power to the system via mechanical disconnection when activated by an assistant diver. The system has default-to-safe behavior, meaning that the circuit is disconnected in the non-actuated state. The mechanical disconnection is implemented using an automotive switching relay controlled by an assistant PCB with hall-sensing capabilities. Two relays are used in a cascaded relay architecture.
+
+To actuate the system, an externally-mounted magnet applies a field through the main body of the AUV. The presence of a strong magnetic field is detected by a hall effect sensor, which switches a small 5V relay and connects 16.8 V battery power through the load circuit. The load circuit of the 5V relay is used to energize the coil circuit for a larger 200 A relay, which carries the high current and voltage used by the thrusters. The 5V relay is used to control the 200A relay to reduce the voltage and current through the more voltage-sensitive hall sensor and prevent arching at high voltage.
+
+The actuator magnet is housed inside a 3-D printed snap-fit enclosure. This was chosen to allow us to access the magnet after operation and prevent degradation from prolonged exposure to water. The magnet is also sealed with marine-grade epoxy resin to further reduce water exposure. The magnet elcosure can be easily removed by the diver using a pull tab when necessary. 
+
+\subsubsection{Motor Interface Board}
+In the 2026 season, a new generic motor interface peripheral board was developed that is compatible with numerous MRG projects. This board features a Raspberry Pi Pico microcontroller board, ten servo outputs, software E-stop actuation and sensing, LED status lights, and compatibility with radio modules. The design is optimized to be interoperable within the MRG development ecosystem, enabling rapid development of future platforms with similar actuation needs. The board is integrated into the AUV with only the needed features, primarily motor actuation.
+
+This is a creative approach to resource management in a multi-competition organization. By developing validated, common hardware, team members can focus more time on novel feature development and field testing instead of base-level system needs. An interoperable design approach is one method of many used to optimize performance with resource scarcity and benefit from collaboration with partner projects.
+
+\subsubsection{Component Safety}
+Overcurrent protections are in place for the overall power system and individual ESCs. An 125 A ANL fuse is placed in series between the backplate interface and 200 A switching relay. The maximum operating current for the system is 240 A when all motors operate at maximum speed. The system is software-capped to draw no more than 120 A under normal operating conditions. This is done to limit vehicle output velocity and reduce risk to components and operators. 30 A blade fuses are placed in series with each ESC. Each motor draws no more than 24 A under normal operating conditions. 
+
+The robot is sealed against water using two O-rings at each end of the central acrylic tube on the removable front and back covers. Small swiveling locks keep the enclosure covers in place even when elevated operating temperatures increase internal pressure. The battery tubes also use two O-rings at each end. A removable plastic cord fully locks the caps in place. 
+
+Additionally, the sub includes four aluminum legs that act as a sensor protection system. The legs allow the sub to sit above the ground on land, preventing the sensors from bearing system weight. While underwater, the sub is prevented from damaging bottom-facing sensors on descent. 
+
+\subsection{\textcolor{red}{Firmware}}
+
+\subsection{Software}
+
+The robot uses the Pontus ROS 2 software stack to connect perception, autonomy, localization, control, simulation, and firmware communication. The main software goal is to avoid one-off competition code that only works for a single demo. Instead, the stack is designed so that the same task logic can run in simulation, dry testing, and pool testing with minimal changes. This is important because the team has much more time available for simulation and bench testing than for full water tests.
+
+Pontus is organized around a standard flow of information. Perception nodes estimate where relevant task objects are relative to the robot. Localization nodes estimate the robot's current motion and position using onboard sensors. Autonomy nodes decide what the robot should do next and generate desired waypoints or task commands. Control nodes convert those desired motions into body-frame commands, which are then sent to firmware and the motor system. Keeping these roles separated makes the system easier to debug because failures can usually be traced to perception, autonomy, localization, control, or firmware instead of being hidden inside one large program.
+
+\begin{figure*}[htbp]
+\centerline{\includegraphics[width=\textwidth]{images/software_flowchart.jpg}}
+\caption{Overview of Software Architecture}
+\label{fig}
+\end{figure*}
+
+\subsubsection{Autonomy}
+The autonomy system is built around task-level behaviors. Each task is written as a state machine with clear conditions for starting the task, searching for the target, tracking the target, completing the task, and exiting if the task cannot be completed. This structure is simple, but it is also flexible enough to support both a basic qualification run and a more complete competition run.
+
+The main autonomy design choice was to make every task depend on the same small set of reliable actions: hold depth, hold heading, move to a waypoint, center on a detected target, search when a target is lost, and report task completion. These actions are reused across the gate, path marker, slalom, surfacing, return, and bin tasks. This reduces the amount of unique code required for each task and makes improvements to one behavior useful across the entire competition run.
+
+Search behavior is especially important because underwater perception is not always continuous. If the robot loses a detection, the autonomy system does not immediately fail the task. Instead, it can hold depth, slow down, sweep in yaw, strafe using the X-drive, or move through a short search pattern until the target is reacquired. These fallback behaviors are intentionally conservative because a stable recovery is more valuable than an aggressive maneuver that risks losing the course entirely.
+
+The run-level autonomy controls the order of tasks. For early testing, the run can be limited to only the gate or only one navigation task. For full competition testing, the same structure can chain multiple tasks together. This allows the team to test individual pieces before attempting a full mission, which helps keep pool tests focused and prevents one failed task from blocking development of the rest of the system.
+
+
+\subsubsection{Perception}
+The perception system is responsible for converting raw sensor data into useful object-level detections. The robot uses both low-light cameras and the Sonoptix Echo multibeam imaging sonar. The cameras are used for YOLO-style object detection, while the sonar is used to generate pointcloud-based detections of larger course objects. Separating the perception system this way allows each sensor to be used for what it does best: cameras provide strong semantic information, while sonar provides useful geometric information and range estimates.
+
+The vision pipeline runs object detection on the forward-facing and downward-facing low-light cameras. The forward-facing cameras are used for tasks such as gate detection, obstacle detection, and visual alignment with course objects. The downward-facing camera is used for path markers and the bin task. Underwater images are collected during pool tests and saved in ROS bags so that the team can label data, train models, and replay the same data through updated perception code. This lets the team improve the vision pipeline without needing to be in the water for every software change.
+
+The sonar pipeline processes data from the Sonoptix Echo multibeam imaging sonar. The sonar returns are converted into a pointcloud representation in the robot frame. Euclidean clustering is then used to separate groups of nearby points into candidate objects. These clusters can be filtered based on properties such as range, position, size, and consistency over time. The output of this pipeline is not a final task decision, but a set of object candidates with useful geometric information.
+
+A major design goal for perception is to avoid sending unstable raw detections directly into autonomy. YOLO detections can flicker, briefly misclassify an object, or jump between nearby objects. Sonar clusters can also appear or disappear due to noise, reflections, or partial views of an object. Instead of allowing these raw detections to directly control the robot, the perception system sends processed camera detections and sonar clusters to the mapping node for additional reasoning.
+
+\subsubsection{Mapping}
+The mapping node takes the processed camera and sonar detections and fuses them into a semantic representation of the course. The main idea is to use the sonar to provide a strong estimate of object position and the cameras to provide a strong semantic label. A sonar cluster may indicate that an object exists at a certain relative position, while a camera detection may indicate what type of object it is. When these observations are consistent in position and timing, the mapping node associates them together into a single semantic object estimate.
+
+Each object in the semantic map stores information such as its estimated position, semantic label, confidence, and recent observation history. This allows the robot to reason about objects over time instead of reacting only to the most recent detection. If a camera briefly loses an object or the sonar produces a noisy cluster, the map can prevent that single bad measurement from immediately changing the autonomy behavior.
+
+The mapping node also creates higher-level ``meta-objects'' from groups of related semantic objects. These meta-objects represent task-level structures rather than individual detections. For example, for the slalom task, the mapper can search over all detected red and white slalom objects and check whether a valid pattern exists. If two white slalom objects and one red slalom object are detected, the mapper checks whether they are approximately collinear and whether the spacing between them is reasonable within a given tolerance. Only after these checks pass does the mapper publish a valid slalom meta-object to autonomy.
+
+This meta-object structure greatly improves reliability. A single false YOLO detection or noisy sonar cluster is much less likely to influence autonomy because it must be consistent with the expected geometry of the task. Instead of asking autonomy to interpret every raw detection, the mapping system provides cleaner task-level information such as a valid gate, valid slalom, valid bin, or valid path marker. This keeps the autonomy logic simpler and makes the robot less sensitive to temporary perception errors.
+
+The mapping stack is also designed to work in simulation. Simulated camera detections, modeled course objects, and simulated sonar-style pointclouds allow the team to test the full perception-to-mapping-to-autonomy pipeline before using pool time. Even though simulation does not perfectly match real underwater images or sonar returns, it is useful for checking message flow, object association, meta-object creation, and autonomy behavior.
+
+
+\subsubsection{Localization}
+Localization is used to provide a stable estimate of the robot's motion during autonomous tasks. The current approach relies on onboard odometry from the DVL, IMU, and depth sensing. These measurements are fused into a consistent robot state that autonomy and control can use. This is especially important for tasks where the robot must hold position or maintain a heading while waiting for perception updates.
+
+\subsubsection{Controls}
+This year the primary focus for controls was to improve the flexibility of the system to allow for various control modes that allow for velocity control in some axes while still maintaining position in the remaining degrees of freedom. For example, the vehicle can be configured to maintain its depth automatically while using velocity commands to move it in the XY plane. During testing and data collection the position hold mode has been especially useful as it allows the vehicle to automatically maintain its position any time it is not actively being commanded by the joystick to move.
+
+Several configurations were considered but ultimately the simplest software layout was found to be using a top level position controller node monitoring the requested control mode as well as the commanded positions and velocities. This node then fuses its position controller outputs and the commanded velocities according to the specific control mode and passes the result down the chain to the velocity controller. The velocity controller then sends commanded body accelerations to the thruster controller node which decomposes the command into individual thruster commands and rescales the outputs to prevent thruster saturation. For periods of testing where the vehicle does not have odometry feedback the controllers also support a direct control mode where joystick commands are passed through to the thruster controller.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.45\textwidth, angle=0]{images/software_cover.png}
+\caption{Vehicle in Simulation Environment with Camera Field of View.}
+\label{TechTritonIMG}
+\end{figure}
+
+\subsubsection{Simulation}
+Simulation is treated as part of the software stack rather than as a separate side project. The Gazebo environment contains modeled course elements, approximate vehicle dynamics, and simulated sensor topics. The goal is not to perfectly simulate every detail of underwater operation, but to provide a fast way to test whether the software behaves correctly before spending pool time.
+
+The same autonomy and control code is intended to run in both simulation and on the real robot. Only the sensor drivers and hardware interfaces should change. This makes simulation useful for regression testing: if a change breaks the gate task, search pattern, or run state machine in simulation, it can be fixed before the next water test.
+ 
+\section{Testing Strategy}
+\subsection{Simulation}
+Because access to a pool for water testing is limited, simulation testing is extremely important to the team. Before running on the real vehicle during a water test all software changes must be tested and reviewed in the simulation environment to verify functionality and check for bugs. While the simulation environment isn't accurate enough to fully test perception software like the YOLO model or sonar point clustering, it is quite effective for testing and developing controller architecture and the autonomous behavior of the vehicle. 
+
+\subsection{Dry Testing}
+In order to maximize the efficiency of water testing, the vehicle's hardware must also be checked for any issues. A single incorrectly soldered wire would take only a few minutes to fix in the lab, but could waste an entire water testing period if the vehicle had to be pulled from the pool and transported back across campus for repairs. In order to avoid this, fully assembled dry tests are conducted the night before a water test to verify that the vehicle's systems are working properly.
+
+\subsection{Pool Testing}
+In order to be efficient during the limited testing time the team follows a set of thoroughly documented setup and testing procedures. During setup these procedures include checklists of the steps for verifying the waterproofing of the vehicle, powering on the various subsystems, and starting the required software to run the vehicle. The procedures also provide the testing plan for that day specifying which systems are to be tested and the goals of the test.
+
+During the testing at least on member of the team is in the pool to help with maneuvering the sub into position and to be able to pull the e-stop in case the vehicle does something unexpected. Additionally, to save time setting up and debugging software the vehicle typically remains tethered unless specifically testing untethered operation.
+
+\subsection{Testing Sequence}
+The first sets of tests were focused on checking and tuning the sensor data from the DVL, sonar, and cameras. Once these were deemed to be working the team moved on to tuning the PID controllers. First, each degree of freedom's gains and feed forward terms for the velocity controllers were independently tuned. Then the gains for the position controllers were tuned and the overall motion of the vehicle was verified. Finally, the team moved on to testing and calibrating the perception and autonomy for specific tasks.
+
+\section{Acknowledgments}
+
+\subsection{Sponsors}
+
+The Marine Robotics Group at Georgia Tech thanks all of our sponsoring organizations that have contributed to the team, whether financially, through hardware, or any other form of support demonstrated. Our corporate sponsors include Tocaro Blue, Vector Nav Technologies, Theia Technologies, TDK Corporration, and Water Linked AS. We also thank Blue Trail Engineering, Southern Fiberworkx, and NVIDIA for supporting our program through discounts, services, or matched donations from individual donors. Our academic supporters include the AquaBots Vertically Integrated Project, the Georgia Tech Student Government Association, the Georgia Tech Student Organization Finance Office, the Georgia Tech Student Foundation, the Aerospace Systems and Design Laboratory, and the School of Aerospace Engineering Student Advisory Council. We also thank the Campus Recreation Center for providing access to their facilities for testing. 
+
+\subsection{Mentors}
+The team thanks Carl Johnson for serving as the primary advisor to MRG, Dr. Michael West for professional insight to the RoboSub project, and Professor Dimitri Mavris for providing for the team at large.
+
+\begin{thebibliography}{00}
+\bibitem{b1} Andy Mark. Compliant Stars. URL: https://andymark.com/products/compliant-stars
+\bibitem{b2} GT Marine Robotics Group. Virtuoso. 2021. URL: https://github.com/gt-marine-robotics-group/Virtuoso.
+\bibitem{b3} Blue Robotics. Sonoptix Echo Imaging Sonar. 2024.
+URL: https://bluerobotics.com/store/sonars/imaging-sonars/sonoptix-echo/.
+\end{thebibliography}
+
+\clearpage
+
+% \begin{figure}[htbp]
+% \centerline{\includegraphics{fig1.png}}
+% \caption{Example of a figure caption.}
+% \label{fig}
+% \end{figure}
+
+% Figure Labels: Use 8 point Times New Roman for Figure labels. Use words 
+% rather than symbols or abbreviations when writing Figure axis labels to 
+% avoid confusing the reader. As an example, write the quantity 
+% ``Magnetization'', or ``Magnetization, M'', not just ``M''. If including 
+% units in the label, present them within parentheses. Do not label axes only 
+% with units. In the example, write ``Magnetization (A/m)'' or ``Magnetization 
+% \{A[m(1)]\}'', not just ``A/m''. Do not label axes with a ratio of 
+% quantities and units. For example, write ``Temperature (K)'', not 
+% ``Temperature/K''.
+
+
+% \section*{References}
+
+% Please number citations consecutively within brackets \cite{b1}. The 
+% sentence punctuation follows the bracket \cite{b2}. Refer simply to the reference 
+% number, as in \cite{b3}---do not use ``Ref. \cite{b3}'' or ``reference \cite{b3}'' except at 
+% the beginning of a sentence: ``Reference \cite{b3} was the first $\ldots$''
+
+% Number footnotes separately in superscripts. Place the actual footnote at 
+% the bottom of the column in which it was cited. Do not put footnotes in the 
+% abstract or reference list. Use letters for table footnotes.
+
+% Unless there are six authors or more give all authors' names; do not use 
+% ``et al.''. Papers that have not been published, even if they have been 
+% submitted for publication, should be cited as ``unpublished'' \cite{b4}. Papers 
+% that have been accepted for publication should be cited as ``in press'' \cite{b5}. 
+% Capitalize only the first word in a paper title, except for proper nouns and 
+% element symbols.
+
+% For papers published in translation journals, please give the English 
+% citation first, followed by the original foreign-language citation \cite{b6}.
+
+%\begin{thebibliography}{00}
+%\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
+%\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
+%\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
+%\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
+%\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
+%\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
+%\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
+%\end{thebibliography}
+
+
+\clearpage
+\onecolumn
+\begin{appendices}
+
+\section{Sponsors}
+
+\clearpage
+
+\section{Component List}
+
+\begin{table}[htp]
+\begin{center}
+\begin{tabularx}{\linewidth}{|*{7}{X|}}
+
+\hline
+\multicolumn{1}{|c|}{\textbf{Component}} & \multicolumn{1}{c|}{\textbf{Vendor}} & \multicolumn{1}{c|}{\textbf{Model/Type}} & \multicolumn{1}{c|}{\textbf{Specs}} & \multicolumn{1}{c|}{\textbf{Custom/Purchased}} & \multicolumn{1}{c|}{\textbf{Cost}} & \multicolumn{1}{c|}{\textbf{Year of Purchase}} \\ \hhline{|=======|}
+Buoyancy Control & --- & --- & --- & --- & --- & --- \\ \hline
+Frame & In-house & Custom Waterjet & --- & Custom & --- & --- \\ \hline
+Waterproof Housing & Blue Robotics & Cylindrical Non-Locking Series 8" ID & 8" ID, 8.5" OD, 26" Length Cast Acrylic Tube & Purchased & \$220 & 2024 \\ \hline
+Waterproof Connectors & BlueTrail & Assorted Cobalt Connectors & 3 Pin Power, 8 Pin, BlueROV Battery Cables, 6 Pin & Purchased & \$50 ea & 2025 \\ \hline
+Thrusters & Blue Robotics & T200 & --- & Purchased & \$245 ea & 2024 \\ \hline
+Waterproof Servo & BlueTrail & SER-2010 & 2.8 Nm, ± 70 degrees & Purchased & \$375 & 2025 \\ \hline
+Motor Interface Board & JLCPCB & Custom PCB with Raspberry Pi Pico & --- & Custom & \$30 & 2026 \\ \hline
+High Level Control & NVIDIA & Jetson Orin Nano & --- & Purchased & \$250 & 2024 \\ \hline
+Battery & Socokin & 4S Lipo Battery & 6600mAh 14.8V, 2 sets of 2 LiPos wired in parallel & Purchased & \$50 ea & 2025 \\ \hline 
+Regulator & DROK & Boost Buck Converter & DC 5.5-30V to 0.5-30V & Purchased & \$17 ea & 2024 \\ \hline
+Internal Comm Network & In-House & USB / Ethernet & USB3 / 1Gbps & Custom & --- & --- \\ \hline
+External Comm Interface & BlueTrail & Ethernet Tether & 1 Gbps & Custom & --- & 2025 \\ \hline
+Cameras & Blue Robotics & Low-Light HD USB Camera & 2x Forward, 1x Downward & Purchased & \$110 ea & 2024 \\ \hline
+Inertial Measurement Unit (IMU) & LORD MicroStrain & 3DM-GX3-25 & --- & Purchased & \$2640 & 2017 \\ \hline
+Doppler Velocity Log (DVL) & WaterLinked & A50 & --- & Purchased & \$7890 & 2024 \\ \hline
+Acoustics & Sonoptix & Echo Multibeam Imaging Sonar & --- & Purchased & \$8950 & 2024 \\ \hline
+Algorithms & Open-source & --- & Color-thresholding, YOLO, Extended Kalman Filter, State Machine & Custom & --- & --- \\ \hline
+Localization and Mapping & Open-Source & --- & Extended Kalman Filter & Custom & --- & --- \\ \hline
+Autonomy & Open-Source & --- & State Machine & Custom & --- & --- \\ \hline
+Open Source Software & Open-Source & --- & ROS2, OpenCV, Gazebo & Custom & --- & --- \\ \hline
+Programming Language(s) & Open-Source & --- & Python, C++ & Custom & --- & --- \\ \hline
+\hhline{|=======|}
+
+\end{tabularx}
+\end{center}
+\end{table}
+
+\clearpage
+\section{AUV CAD}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth, angle=0]{images/Dome Iso2.png}
+\caption{3D isometric view of the AUV's external components}
+\label{app_B_external_iso}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth, angle=0]{images/Dome Top.png}
+\caption{Top view of the fully assembled AUV}
+\label{Sub_Top}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth, angle=0]{images/Dome Front.png}
+\caption{Front view of the fully assembled AUV}
+\label{Sub_Front2}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.65\textwidth, angle=0]{images/Dome Side.png}
+\caption{Side view of the fully assembled AUV}
+\label{Sub_rhv}
+\end{figure}
+
+\clearpage
+\newgeometry{margin=0cm, top=1.5cm}
+\begin{landscape}
+\vspace*{0cm}
+
+% ── Colour palette ──────────────────────────────────────────────────
+\definecolor{darkgray}    {HTML}{424242}
+\definecolor{midgray}     {HTML}{757575}
+\definecolor{lightgray}   {HTML}{BDBDBD}
+\definecolor{subtlegray}  {HTML}{EEEEEE}
+\definecolor{groupbg}     {HTML}{E0E0E0}
+\definecolor{titlegray}   {HTML}{212121}
+
+\pagestyle{empty}
+
+% ══════════════════════════════════════════════════════════════════
+% PAGE 1 — WATER TESTS
+% ══════════════════════════════════════════════════════════════════
+\vspace*{1.5cm}
+\begin{center}
+  {\LARGE\bfseries\color{titlegray} Planned Water Tests — January to April 2026}\\[6pt]
+\end{center}
+\vspace{6pt}
+\begin{ganttchart}[
+    hgrid, vgrid={*{1}{dotted}},
+    time slot format=isodate, time slot unit=day,
+    x unit=0.238cm, y unit title=0.8cm, y unit chart=0.8cm,
+    title height=1, title label font=\small\bfseries,
+    bar label font=\small, group label font=\small\bfseries,
+    bar height=0.55, group top shift=0.3, group height=0.3, bar top shift=0.2,
+    group/.append style={fill=groupbg, draw=darkgray!60},
+    bar/.append style={draw=darkgray!50},
+    bar label node/.append style={align=right, text width=1.5cm},
+    group label node/.append style={align=right, text width=1.5cm},
+    canvas/.append style={fill=white},
+  ]{2026-01-16}{2026-04-30}
+  \gantttitlecalendar{month=name, week} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Water Tests}{2026-01-30}{2026-04-24} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#1}{2026-01-30}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#2}{2026-02-13}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#3}{2026-02-27}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#4}{2026-03-06}{2026-03-06} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#5}{2026-03-13}{2026-03-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#6}{2026-04-03}{2026-04-03} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#7}{2026-04-10}{2026-04-10} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#8}{2026-04-17}{2026-04-17} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {WT \#9}{2026-04-24}{2026-04-24}
+\end{ganttchart}
+
+\clearpage
+
+% ══════════════════════════════════════════════════════════════════
+% PAGE 2 — MECHANICAL
+% ══════════════════════════════════════════════════════════════════
+\vspace*{1.5cm}
+\begin{center}
+  {\LARGE\bfseries\color{titlegray} Planned Mechanical — January to April 2026}\\[6pt]
+\end{center}
+\vspace{6pt}
+\begin{center}
+\begin{ganttchart}[
+    hgrid, vgrid={*{1}{dotted}},
+    time slot format=isodate, time slot unit=day,
+    x unit=0.213cm, y unit title=0.45cm, y unit chart=0.5cm,
+    title height=1, title label font=\small\bfseries,
+    bar label font=\small, group label font=\small\bfseries,
+    bar height=0.55, group top shift=0.3, group height=0.3, bar top shift=0.2,
+    group/.append style={fill=groupbg, draw=darkgray!60},
+    bar/.append style={draw=darkgray!50},
+    bar label node/.append style={align=right, text width=4cm},
+    group label node/.append style={align=right, text width=4cm},
+    canvas/.append style={fill=white},
+  ]{2026-01-16}{2026-04-30}
+  \gantttitlecalendar{month=name, week} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Torpedo}{2026-01-16}{2026-04-02} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Backplate Design}{2026-01-16}{2026-01-29} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Fab \& Assembly}{2026-01-29}{2026-02-05} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Integration}{2026-02-05}{2026-02-12} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Launcher Conceptual DR}{2026-01-29}{2026-02-12} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Launcher CAD Assembly}{2026-02-05}{2026-02-26} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Launcher Design Review}{2026-02-27}{2026-03-05} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Launcher Fab \& Assembly}{2026-03-05}{2026-03-12} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Launcher Integration}{2026-03-12}{2026-04-02} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Dropper}{2026-01-16}{2026-02-26} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Conceptual DR}{2026-01-16}{2026-02-04} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {CAD Assembly}{2026-01-29}{2026-02-05} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {CAD Design Review}{2026-02-06}{2026-02-09} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Fab \& Assembly}{2026-02-09}{2026-02-19} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Integration}{2026-02-19}{2026-02-26} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Other}{2026-01-16}{2026-04-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Octagon Table}{2026-02-13}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {3rd Set of Slaloms}{2026-02-06}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Paint Marker Neon}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Sensor Protection Fab}{2026-01-30}{2026-02-05} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Terminal Ring Covers}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {ESC PCB Mount Revisions}{2026-01-16}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Print Mount for Relay}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {New Holes for ESC Cases}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Full CAD Assembly Updates}{2026-04-01}{2026-04-16} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {URDF Update}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=lightgray}]
+    {Mech Documentation}{2026-01-16}{2026-04-30}
+\end{ganttchart}
+\end{center}
+
+\clearpage
+
+% ══════════════════════════════════════════════════════════════════
+% PAGE 3 — SOFTWARE
+% ══════════════════════════════════════════════════════════════════
+\vspace*{1.5cm}
+\begin{center}
+  {\LARGE\bfseries\color{titlegray} Planned Software — January to April 2026}\\[6pt]
+\end{center}
+\vspace{6pt}
+\begin{center}
+\begin{ganttchart}[
+    hgrid, vgrid={*{1}{dotted}},
+    time slot format=isodate, time slot unit=day,
+    x unit=0.213cm, y unit title=0.45cm, y unit chart=0.8cm,
+    title height=1, title label font=\small\bfseries,
+    bar label font=\small, group label font=\small\bfseries,
+    bar height=0.55, group top shift=0.3, group height=0.3, bar top shift=0.2,
+    group/.append style={fill=groupbg, draw=darkgray!60},
+    bar/.append style={draw=darkgray!50},
+    bar label node/.append style={align=right, text width=4cm},
+    group label node/.append style={align=right, text width=4cm},
+    canvas/.append style={fill=white},
+  ]{2026-01-16}{2026-04-30}
+  \gantttitlecalendar{month=name, week} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Milestones}{2026-01-16}{2026-04-30} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Milestone 1: Full Sim Run}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Milestone 2: 1st Full Pool Run}{2026-02-27}{2026-03-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Milestone 3: Reliable Autonomy}{2026-03-13}{2026-04-30} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Tasks}{2026-01-16}{2026-04-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Camera Calibration}{2026-01-30}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Semantic Map Verif.}{2026-01-30}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Controller Tuning}{2026-01-30}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {DVL Drift Experiments}{2026-01-30}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Gate Autonomy}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Slalom Autonomy}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Octagon Surfacing Autonomy}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Return Home Autonomy}{2026-01-16}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {ROS--Firmware Bridge (Protobuf)}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Navigation Autonomy Validation}{2026-02-27}{2026-03-13} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {YOLO Reliability}{2026-02-27}{2026-04-30} \\
+  \ganttbar[bar/.append style={fill=lightgray}]
+    {Software Documentation}{2026-01-16}{2026-04-30}
+\end{ganttchart}
+\end{center}
+
+\clearpage
+
+% ══════════════════════════════════════════════════════════════════
+% PAGE 4 — ELECTRICAL & FIRMWARE
+% ══════════════════════════════════════════════════════════════════
+\vspace*{1.5cm}
+\begin{center}
+  {\LARGE\bfseries\color{titlegray} Planned Electrical \& Firmware — January to April 2026}\\[6pt]
+\end{center}
+\vspace{6pt}
+\begin{center}
+\begin{ganttchart}[
+    hgrid, vgrid={*{1}{dotted}},
+    time slot format=isodate, time slot unit=day,
+    x unit=0.213cm, y unit title=0.45cm, y unit chart=0.8cm,
+    title height=1, title label font=\small\bfseries,
+    bar label font=\small, group label font=\small\bfseries,
+    bar height=0.55, group top shift=0.3, group height=0.3, bar top shift=0.2,
+    group/.append style={fill=groupbg, draw=darkgray!60},
+    bar/.append style={draw=darkgray!50},
+    bar label node/.append style={align=right, text width=4cm},
+    group label node/.append style={align=right, text width=4cm},
+    canvas/.append style={fill=white},
+  ]{2026-01-16}{2026-04-30}
+  \gantttitlecalendar{month=name, week} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Electrical}{2026-01-16}{2026-03-06} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Test \& Integrate EStop}{2026-01-16}{2026-01-29} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Current Sensing Board Rev.}{2026-01-22}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Presto Board Revisions}{2026-01-22}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Sensing Board Revisions}{2026-01-16}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Dropper Materials Sourcing}{2026-01-22}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Power Distribution Board KiCAD}{2026-01-30}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Dropper Power Design Review}{2026-02-06}{2026-02-13} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {ESC Power Design Review}{2026-02-13}{2026-02-16} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Dropper Wiring}{2026-02-13}{2026-02-27} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Presto \& CS Bench Testing}{2026-02-16}{2026-02-20} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Presto \& CS Integration}{2026-02-20}{2026-03-06} \\
+  \ganttbar[bar/.append style={fill=darkgray}]
+    {Torpedo PCB Integration}{2026-01-30}{2026-02-26} \\
+  \ganttgroup[group/.append style={fill=lightgray!60}]
+    {Firmware}{2026-01-16}{2026-02-26} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Firmware: Presto}{2026-01-16}{2026-01-30} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Firmware: Sensing Board}{2026-01-16}{2026-02-06} \\
+  \ganttbar[bar/.append style={fill=midgray}]
+    {Firmware: Torpedo}{2026-01-30}{2026-02-26}
+\end{ganttchart}
+\end{center}
+
+\restoregeometry
+\clearpage
+
+\end{landscape}
+
+
+\end{appendices}
+
+\end{document}
